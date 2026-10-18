@@ -1,3 +1,8 @@
 zh_CN:
   site_settings:
     kuu_market_enabled: "启用 KUU 二手市场（出售 / 求购表单、帖子状态、自动过期）。"
+    kuu_market_category: "二手市场分类。在这个分类里只能用插件的表单发新帖（管理员除外），回复不受影响。"
+    kuu_market_expire_days: "出售 / 求购帖进入在售或求购状态满多少天后自动过期。"
+    kuu_market_bump_interval_days: "重新上架时把帖子顶回「最新」的最短间隔（天）。间隔内重新上架照样能改状态，只是不顶帖。"
+    kuu_market_max_photos: "出售帖最多能放几张照片。"
+    kuu_market_locations: "表单里「交易地点」的选项。表单另外固定有「其他」，选它时手填。"

@@ -2,3 +2,25 @@ discourse_kuu_market:
   kuu_market_enabled:
     default: false
     client: true
+  kuu_market_category:
+    type: category
+    default: ""
+    client: true
+  kuu_market_expire_days:
+    default: 30
+    min: 1
+    max: 365
+  kuu_market_bump_interval_days:
+    default: 7
+    min: 0
+    max: 365
+  kuu_market_max_photos:
+    default: 9
+    min: 1
+    max: 20
+    client: true
+  kuu_market_locations:
+    type: list
+    list_type: simple
+    default: "吉田本校区|桂校区|宇治校区"
+    client: true
