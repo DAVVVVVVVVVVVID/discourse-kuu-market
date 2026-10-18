@@ -9,6 +9,8 @@ en:
   kuu_market:
     errors:
       use_market_form: "To post in the market, click \"New Topic\" in the market category and use the sell / buy form."
+      kind_unchanged: "A listing cannot switch between selling and buying after it is posted."
+      edit_with_market_form: "The title and first post of a listing come from its form. Use the \"Edit\" button on the listing instead."
     listing:
       title:
         sell: "[For sale] %{item} · %{price}"

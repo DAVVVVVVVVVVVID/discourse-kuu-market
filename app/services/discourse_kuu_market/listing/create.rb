@@ -66,7 +66,7 @@ module DiscourseKuuMarket
     def publish_listing(guardian:, category:, listing:, params:)
       renderer = ListingRenderer.new(listing)
       result =
-        GeneratedTitle.allow(renderer.title) do
+        FormSubmission.submit(renderer.title) do
           NewPostManager.new(
             guardian.user,
             :title => renderer.title,

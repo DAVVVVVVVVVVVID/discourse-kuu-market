@@ -9,6 +9,8 @@ zh_CN:
   kuu_market:
     errors:
       use_market_form: "二手市场的帖子请在二手市场分类里点「新建话题」，用出售 / 求购表单发布。"
+      kind_unchanged: "发帖后不能在出售和求购之间切换。"
+      edit_with_market_form: "二手帖的标题和第一楼由表单生成，请用帖子上的「修改」按钮修改。"
     listing:
       title:
         sell: "【出售】%{item} · %{price}"

@@ -31,5 +31,36 @@ module DiscourseKuuMarket
         end
       end
     end
+
+    def update
+      Listing::Update.call(service_params) do
+        on_success { head :no_content }
+        on_model_not_found(:listing) { raise Discourse::NotFound }
+        on_failed_contract do |contract|
+          render(
+            json: failed_json.merge(errors: contract.errors.full_messages),
+            status: :bad_request,
+          )
+        end
+        on_failed_policy(:listing_in_market) { raise Discourse::NotFound }
+        on_failed_policy(:can_edit_listing) { raise Discourse::InvalidAccess }
+        on_failed_policy(:kind_unchanged) do
+          render(
+            json: failed_json.merge(errors: [I18n.t("kuu_market.errors.kind_unchanged")]),
+            status: :unprocessable_content,
+          )
+        end
+        on_failed_policy(:photos_available_to_editor) { raise Discourse::InvalidAccess }
+        on_model_errors(:revised_listing) do |listing|
+          render(
+            json: failed_json.merge(errors: listing.errors.full_messages),
+            status: :unprocessable_content,
+          )
+        end
+        on_failed_step(:revise_first_post) do |step|
+          render(json: failed_json.merge(errors: [step.error]), status: :unprocessable_content)
+        end
+      end
+    end
   end
 end
