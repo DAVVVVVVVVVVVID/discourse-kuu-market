@@ -50,8 +50,26 @@ en:
           budget_required: "Fill in at least one end of the budget"
           budget_order: "The maximum cannot be lower than the minimum"
           too_many_photos: "Up to %{count}"
+      statuses:
+        selling: "For sale"
+        sold: "Sold"
+        buying: "Wanted"
+        closed: "Closed"
+        expired: "Expired"
       panel:
         edit: "Edit"
+        expires_on: "Expires %{date}"
+        change_to:
+          selling: "Relist"
+          sold: "Mark as sold"
+          buying: "Keep looking"
+          closed: "Mark as closed"
+        confirm_end:
+          sell: "Marking it as sold closes replies and hides it from other people's lists and search (the link still works). You can relist it later. Continue?"
+          buy: "Marking it as closed closes replies and hides it from other people's lists and search (the link still works). You can keep looking later. Continue?"
+        ended: "Status updated."
+        relisted_and_bumped: "Relisted and bumped to the top of Latest."
+        relisted_without_bump: "Relisted. It was not bumped this time (at most once every %{days} days); relisting after %{date} will bump it."
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"

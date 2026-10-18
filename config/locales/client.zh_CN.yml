@@ -50,8 +50,26 @@ zh_CN:
           budget_required: "最低、最高预算至少填一个"
           budget_order: "最高预算不能低于最低预算"
           too_many_photos: "最多 %{count} 张"
+      statuses:
+        selling: "在售"
+        sold: "已出"
+        buying: "求购中"
+        closed: "已结束"
+        expired: "已过期"
       panel:
         edit: "修改"
+        expires_on: "%{date} 自动过期"
+        change_to:
+          selling: "重新上架"
+          sold: "标记已出"
+          buying: "继续求购"
+          closed: "标记结束"
+        confirm_end:
+          sell: "标记已出后会关闭回复，别人在列表和搜索里也看不到这个帖子了（链接仍能打开）。以后可以重新上架。确定吗？"
+          buy: "标记结束后会关闭回复，别人在列表和搜索里也看不到这个帖子了（链接仍能打开）。以后可以继续求购。确定吗？"
+        ended: "状态已更新。"
+        relisted_and_bumped: "已重新上架，并顶回了「最新」最上面。"
+        relisted_without_bump: "已重新上架。这次没有顶帖（每 %{days} 天最多顶一次），%{date} 之后再重新上架就会顶帖。"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"

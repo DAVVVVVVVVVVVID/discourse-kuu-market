@@ -14,6 +14,7 @@ discourse_kuu_market:
     default: 7
     min: 0
     max: 365
+    client: true
   kuu_market_max_photos:
     default: 9
     min: 1

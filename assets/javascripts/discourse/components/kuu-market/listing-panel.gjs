@@ -1,15 +1,57 @@
 import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
+import { fn } from "@ember/helper";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import { ajax } from "discourse/lib/ajax";
+import { popupAjaxError } from "discourse/lib/ajax-error";
+import { longDate } from "discourse/lib/formatter";
+import { eq } from "discourse/truth-helpers";
 import DButton from "discourse/ui-kit/d-button";
+import { i18n } from "discourse-i18n";
 import ListingForm from "./modal/listing-form";
 
-// 帖子页标题下方：作者和管理员看到「修改」按钮
+// 帖子页标题下方：所有人看到状态；作者和管理员看到过期时间、切换状态和「修改」按钮
 export default class ListingPanel extends Component {
+  @service dialog;
   @service modal;
+  @service router;
+  @service siteSettings;
+  @service toasts;
+
+  @tracked changingTo = null;
 
   get listing() {
     return this.args.outletArgs.model.kuu_market_listing;
+  }
+
+  get statusLabel() {
+    return i18n(`kuu_market.statuses.${this.listing.status}`);
+  }
+
+  get isChanging() {
+    return !!this.changingTo;
+  }
+
+  get expiresOn() {
+    return this.listing.expires_at && longDate(this.listing.expires_at);
+  }
+
+  @action
+  actionLabel(status) {
+    return `kuu_market.panel.change_to.${status}`;
+  }
+
+  @action
+  changeStatus(status) {
+    if (this.#endsListing(status)) {
+      this.dialog.yesNoConfirm({
+        message: i18n(`kuu_market.panel.confirm_end.${this.listing.kind}`),
+        didConfirm: () => this.#saveStatus(status),
+      });
+    } else {
+      this.#saveStatus(status);
+    }
   }
 
   @action
@@ -17,17 +59,78 @@ export default class ListingPanel extends Component {
     this.modal.show(ListingForm, { model: { listing: this.listing } });
   }
 
+  #endsListing(status) {
+    return status === "sold" || status === "closed";
+  }
+
+  async #saveStatus(status) {
+    this.changingTo = status;
+
+    try {
+      const result = await ajax(
+        `/kuu-market/listings/${this.listing.topic_id}/status.json`,
+        { type: "PUT", data: { status } }
+      );
+      this.#announce(status, result);
+      this.router.refresh();
+    } catch (error) {
+      popupAjaxError(error);
+    } finally {
+      this.changingTo = null;
+    }
+  }
+
+  #announce(status, { listing, bumped }) {
+    let message;
+    if (this.#endsListing(status)) {
+      message = i18n("kuu_market.panel.ended");
+    } else if (bumped) {
+      message = i18n("kuu_market.panel.relisted_and_bumped");
+    } else {
+      message = i18n("kuu_market.panel.relisted_without_bump", {
+        date: longDate(listing.next_bump_at),
+        days: this.siteSettings.kuu_market_bump_interval_days,
+      });
+    }
+
+    this.toasts.success({ duration: "long", data: { message } });
+  }
+
   <template>
-    {{#if this.listing.can_manage}}
+    {{#if this.listing}}
       <div class="kuu-market-panel">
-        <div class="kuu-market-panel__actions">
-          <DButton
-            class="btn-default kuu-market-panel__edit"
-            @action={{this.edit}}
-            @icon="pencil"
-            @label="kuu_market.panel.edit"
-          />
-        </div>
+        <span
+          class="kuu-market-panel__status kuu-market-status-{{this.listing.status}}"
+        >
+          {{this.statusLabel}}
+        </span>
+
+        {{#if this.expiresOn}}
+          <span class="kuu-market-panel__expiry">
+            {{i18n "kuu_market.panel.expires_on" date=this.expiresOn}}
+          </span>
+        {{/if}}
+
+        {{#if this.listing.can_manage}}
+          <div class="kuu-market-panel__actions">
+            {{#each this.listing.statuses_reachable as |status|}}
+              <DButton
+                class="btn-default kuu-market-panel__change"
+                data-status={{status}}
+                @action={{fn this.changeStatus status}}
+                @disabled={{this.isChanging}}
+                @isLoading={{eq this.changingTo status}}
+                @label={{this.actionLabel status}}
+              />
+            {{/each}}
+            <DButton
+              class="btn-default kuu-market-panel__edit"
+              @action={{this.edit}}
+              @icon="pencil"
+              @label="kuu_market.panel.edit"
+            />
+          </div>
+        {{/if}}
       </div>
     {{/if}}
   </template>

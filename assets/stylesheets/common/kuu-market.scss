@@ -67,11 +67,38 @@
 }
 
 .kuu-market-panel {
+  // 品牌色：樱花粉、浅雾蓝、藏青。主题组件可以覆盖
+  --kuu-market-sakura: #ed8690;
+  --kuu-market-mist: #c0d1e4;
+  --kuu-market-navy: #0a2d56;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-2) var(--space-3);
   align-items: center;
   margin-bottom: var(--space-3);
+
+  &__status {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--d-default-border-radius);
+    background: var(--primary-low);
+    color: var(--primary-high);
+    font-weight: bold;
+
+    &.kuu-market-status-selling {
+      background: var(--kuu-market-sakura);
+      color: var(--kuu-market-navy);
+    }
+
+    &.kuu-market-status-buying {
+      background: var(--kuu-market-mist);
+      color: var(--kuu-market-navy);
+    }
+  }
+
+  &__expiry {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
 
   &__actions {
     display: flex;

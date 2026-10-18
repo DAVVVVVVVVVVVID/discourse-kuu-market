@@ -3,7 +3,15 @@
 module DiscourseKuuMarket
   # 帖子页用：状态显示、切换按钮，以及修改表单回填的字段和照片
   class TopicListingSerializer < ListingSerializer
-    attributes :photos, :can_manage, :statuses_reachable
+    attributes :photos, :can_manage, :statuses_reachable, :expires_at
+
+    def expires_at
+      object.active_since + SiteSetting.kuu_market_expire_days.days
+    end
+
+    def include_expires_at?
+      can_manage && object.active?
+    end
 
     def photos
       uploads = Upload.where(id: object.upload_ids).index_by(&:id)
