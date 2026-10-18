@@ -5,7 +5,7 @@ en:
     kuu_market_expire_days: "Days a listing stays for sale or wanted before it expires automatically."
     kuu_market_bump_interval_days: "Minimum days between bumps to the top of Latest when a listing is relisted. Relisting within this interval still changes the status, without the bump."
     kuu_market_max_photos: "Maximum number of photos on a sell listing."
-    kuu_market_locations: "Options for the meeting place in the form. The form always adds \"Other\", which lets the user type a place."
+    kuu_market_default_location: "Meeting place prefilled in the listing form. Users can change it."
   kuu_market:
     errors:
       use_market_form: "To post in the market, click \"New Topic\" in the market category and use the sell / buy form."

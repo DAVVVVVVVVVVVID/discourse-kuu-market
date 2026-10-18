@@ -28,6 +28,13 @@ RSpec.describe "Posting and editing a listing" do
     expect(composer).to be_closed
   end
 
+  it "prefills the default meeting place" do
+    SiteSetting.kuu_market_default_location = "Yoshida campus"
+    open_form
+
+    expect(listing_form.field("location").value).to eq("Yoshida campus")
+  end
+
   it "posts a listing for sale with a photo" do
     open_form
     listing_form.fill_in("item_name", "IKEA desk").fill_in("price", "3000")
@@ -67,12 +74,11 @@ RSpec.describe "Posting and editing a listing" do
     expect(listing_form).to have_field_error("budget_max")
   end
 
-  it "lets the seller type another meeting place" do
+  it "lets the seller change the prefilled meeting place" do
     open_form
     listing_form.fill_in("item_name", "Rice cooker")
     listing_form.field("free").toggle
-    listing_form.field("location").select(OTHER_LOCATION_VALUE)
-    listing_form.fill_in("location_other", "Hyakumanben")
+    listing_form.fill_in("location", "Hyakumanben")
     listing_form.upload_photo(photo)
     listing_form.submit
 
@@ -124,6 +130,4 @@ RSpec.describe "Posting and editing a listing" do
       expect(page).to have_no_css(".kuu-market-panel__edit")
     end
   end
-
-  OTHER_LOCATION_VALUE = "__other__"
 end

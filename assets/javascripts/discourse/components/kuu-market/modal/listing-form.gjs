@@ -16,10 +16,8 @@ import {
   formDataFor,
   ITEM_NAME_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
-  locationOptions,
   MAX_YEN,
   maxPhotos,
-  OTHER_LOCATION,
   payloadFrom,
   TRADE_METHODS,
 } from "../../../lib/kuu-market";
@@ -37,9 +35,7 @@ export default class ListingForm extends Component {
   descriptionValidation = `length:0,${DESCRIPTION_MAX_LENGTH}`;
   formData = formDataFor(this.args.model.listing, this.siteSettings);
   itemNameValidation = `required:trim|length:1,${ITEM_NAME_MAX_LENGTH}`;
-  locationOtherValidation = `length:0,${LOCATION_MAX_LENGTH}`;
-  locations = locationOptions(this.siteSettings);
-  otherLocation = OTHER_LOCATION;
+  locationValidation = `required:trim|length:1,${LOCATION_MAX_LENGTH}`;
   priceValidation = `required|integer|between:0,${MAX_YEN}`;
   tradeMethods = TRADE_METHODS;
   yenValidation = `integer|between:0,${MAX_YEN}`;
@@ -106,10 +102,6 @@ export default class ListingForm extends Component {
           count: maxPhotos(data.kind, this.siteSettings),
         }),
       });
-    }
-
-    if (data.location === OTHER_LOCATION && !data.location_other?.trim()) {
-      required("location_other", "kuu_market.form.location_other");
     }
   }
 
@@ -260,31 +252,14 @@ export default class ListingForm extends Component {
           <form.Field
             @name="location"
             @title={{i18n "kuu_market.form.location"}}
-            @type="select"
-            @validation="required"
+            @type="input"
+            @validation={{this.locationValidation}}
             as |field|
           >
-            <field.Control @includeNone={{false}} as |select|>
-              {{#each this.locations as |location|}}
-                <select.Option @value={{location}}>{{location}}</select.Option>
-              {{/each}}
-              <select.Option @value={{this.otherLocation}}>
-                {{i18n "kuu_market.form.other_location"}}
-              </select.Option>
-            </field.Control>
+            <field.Control
+              placeholder={{i18n "kuu_market.form.location_placeholder"}}
+            />
           </form.Field>
-
-          {{#if (eq data.location this.otherLocation)}}
-            <form.Field
-              @name="location_other"
-              @title={{i18n "kuu_market.form.location_other"}}
-              @type="input"
-              @validation={{this.locationOtherValidation}}
-              as |field|
-            >
-              <field.Control />
-            </form.Field>
-          {{/if}}
 
           {{#if (eq data.kind "sell")}}
             <form.Field

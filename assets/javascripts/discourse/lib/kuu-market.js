@@ -5,15 +5,10 @@ export const DESCRIPTION_MAX_LENGTH = 2000;
 export const MAX_YEN = 100_000_000;
 export const BUY_MAX_PHOTOS = 1;
 
-export const OTHER_LOCATION = "__other__";
 export const TRADE_METHODS = ["pickup", "delivery", "negotiable"];
 
 export function marketCategoryId(siteSettings) {
   return parseInt(siteSettings.kuu_market_category, 10) || null;
-}
-
-export function locationOptions(siteSettings) {
-  return (siteSettings.kuu_market_locations || "").split("|").filter(Boolean);
 }
 
 export function maxPhotos(kind, siteSettings) {
@@ -21,8 +16,6 @@ export function maxPhotos(kind, siteSettings) {
 }
 
 export function formDataFor(listing, siteSettings) {
-  const options = locationOptions(siteSettings);
-
   if (!listing) {
     return {
       kind: "sell",
@@ -31,15 +24,13 @@ export function formDataFor(listing, siteSettings) {
       free: false,
       budget_min: null,
       budget_max: null,
-      location: options[0] ?? OTHER_LOCATION,
-      location_other: "",
+      location: siteSettings.kuu_market_default_location ?? "",
       trade_method: "pickup",
       description: "",
       photos: [],
     };
   }
 
-  const knownLocation = options.includes(listing.location);
   return {
     kind: listing.kind,
     item_name: listing.item_name,
@@ -47,8 +38,7 @@ export function formDataFor(listing, siteSettings) {
     free: listing.free,
     budget_min: listing.budget_min,
     budget_max: listing.budget_max,
-    location: knownLocation ? listing.location : OTHER_LOCATION,
-    location_other: knownLocation ? "" : listing.location,
+    location: listing.location,
     trade_method: listing.trade_method ?? "pickup",
     description: listing.description,
     photos: listing.photos ?? [],
@@ -59,10 +49,7 @@ export function payloadFrom(data) {
   const common = {
     kind: data.kind,
     item_name: data.item_name?.trim(),
-    location:
-      data.location === OTHER_LOCATION
-        ? data.location_other?.trim()
-        : data.location,
+    location: data.location?.trim(),
     description: data.description ?? "",
     upload_ids: data.photos.map((photo) => photo.id),
   };
