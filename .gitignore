@@ -1,0 +1,6 @@
+node_modules
+/gems
+/auto_generated
+.eslintcache
+/2026-10-18-handoff-market-plugin.md
+/screenshots

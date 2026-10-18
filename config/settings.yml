@@ -1,0 +1,4 @@
+discourse_kuu_market:
+  kuu_market_enabled:
+    default: false
+    client: true
