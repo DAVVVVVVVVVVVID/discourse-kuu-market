@@ -7,6 +7,8 @@ zh_CN:
     kuu_market_max_photos: "出售帖最多能放几张照片。"
     kuu_market_locations: "表单里「交易地点」的选项。表单另外固定有「其他」，选它时手填。"
   kuu_market:
+    errors:
+      use_market_form: "二手市场的帖子请在二手市场分类里点「新建话题」，用出售 / 求购表单发布。"
     listing:
       title:
         sell: "【出售】%{item} · %{price}"

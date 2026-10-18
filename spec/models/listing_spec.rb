@@ -117,6 +117,41 @@ RSpec.describe DiscourseKuuMarket::Listing do
     end
   end
 
+  describe ".open" do
+    it "starts a listing for sale or wanted from now" do
+      freeze_time
+
+      sell = described_class.open(kind: "sell")
+      buy = described_class.open(kind: "buy")
+
+      expect(sell.status).to eq("selling")
+      expect(sell.active_since).to eq_time(Time.zone.now)
+      expect(sell.last_bumped_at).to eq_time(Time.zone.now)
+      expect(buy.status).to eq("buying")
+    end
+
+    it "leaves the status empty for an unknown kind" do
+      expect(described_class.open(kind: nil).status).to be_nil
+    end
+  end
+
+  describe "photos" do
+    it "only accepts existing image uploads" do
+      SiteSetting.authorized_extensions = "png|pdf"
+      pdf = Fabricate(:upload, original_filename: "manual.pdf", extension: "pdf")
+      deleted = Fabricate(:upload).tap(&:destroy!)
+
+      expect(Fabricate.build(:kuu_market_listing, upload_ids: [pdf.id])).not_to be_valid
+      expect(Fabricate.build(:kuu_market_listing, upload_ids: [deleted.id])).not_to be_valid
+    end
+
+    it "rejects the same photo twice" do
+      photo = Fabricate(:upload)
+
+      expect(Fabricate.build(:kuu_market_listing, upload_ids: [photo.id, photo.id])).not_to be_valid
+    end
+  end
+
   it "limits the length of the text fields" do
     expect(
       Fabricate.build(

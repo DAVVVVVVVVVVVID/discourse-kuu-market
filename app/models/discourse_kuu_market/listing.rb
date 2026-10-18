@@ -30,9 +30,10 @@ module DiscourseKuuMarket
            allow_nil: true,
          }
 
-    belongs_to :topic
+    # 表单内容在话题建出来之前就要校验，所以这里不要求 topic；数据库里 topic_id 不能为空
+    belongs_to :topic, -> { with_deleted }, optional: true
 
-    validates :topic_id, uniqueness: true
+    validates :topic_id, uniqueness: { allow_nil: true }
     validates :item_name, presence: true, length: { maximum: ITEM_NAME_MAX_LENGTH }
     validates :location, presence: true, length: { maximum: LOCATION_MAX_LENGTH }
     validates :description, length: { maximum: DESCRIPTION_MAX_LENGTH }
@@ -49,6 +50,19 @@ module DiscourseKuuMarket
     validate :status_matches_kind
     validate :sell_fields, if: :sell?
     validate :buy_fields, if: :buy?
+    validate :photos_are_images
+
+    # 新发的帖子从现在开始在售或求购，30 天过期和 7 天顶帖都从现在算
+    def self.open(attributes)
+      now = Time.zone.now
+      new(attributes).tap do |listing|
+        listing.assign_attributes(
+          status: listing.kind && active_status_for(listing.kind),
+          active_since: now,
+          last_bumped_at: now,
+        )
+      end
+    end
 
     def self.active_status_for(kind)
       ACTIVE_STATUS.fetch(kind.to_s)
@@ -92,6 +106,17 @@ module DiscourseKuuMarket
       elsif budget_min && budget_max && budget_min > budget_max
         errors.add(:budget_max, :greater_than_or_equal_to, count: budget_min)
       end
+    end
+
+    def photos_are_images
+      return if upload_ids.empty?
+
+      images =
+        Upload
+          .where(id: upload_ids)
+          .pluck(:original_filename)
+          .count { |filename| FileHelper.is_supported_image?(filename) }
+      errors.add(:upload_ids, :invalid) if images != upload_ids.size
     end
   end
 end

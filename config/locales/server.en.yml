@@ -7,6 +7,8 @@ en:
     kuu_market_max_photos: "Maximum number of photos on a sell listing."
     kuu_market_locations: "Options for the meeting place in the form. The form always adds \"Other\", which lets the user type a place."
   kuu_market:
+    errors:
+      use_market_form: "To post in the market, click \"New Topic\" in the market category and use the sell / buy form."
     listing:
       title:
         sell: "[For sale] %{item} · %{price}"

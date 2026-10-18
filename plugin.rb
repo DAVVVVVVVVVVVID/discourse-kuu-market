@@ -11,8 +11,38 @@ enabled_site_setting :kuu_market_enabled
 
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"
+
+  def self.market_category?(category_id)
+    market_category_id = SiteSetting.kuu_market_category.to_i
+    market_category_id > 0 && category_id.to_i == market_category_id
+  end
 end
 
 require_relative "lib/discourse_kuu_market/engine"
 
-after_initialize {}
+after_initialize do
+  reloadable_patch do
+    Topic.has_one :kuu_market_listing,
+                  class_name: "DiscourseKuuMarket::Listing",
+                  dependent: :destroy,
+                  autosave: true
+  end
+
+  NewPostManager.add_handler(100) { |manager| DiscourseKuuMarket::NewTopicRules.check(manager) }
+
+  # 需要审核的帖子，批准时由 core 按审核记录里存的参数建帖
+  NewPostManager.add_plugin_payload_attribute(DiscourseKuuMarket::NewTopicRules::LISTING_ARG)
+
+  # 发帖和审核通过建帖都会触发，二手帖记录和话题在同一个事务里保存
+  on(:before_create_topic) do |topic, creator|
+    attributes = creator.opts[DiscourseKuuMarket::NewTopicRules::LISTING_ARG]
+    if attributes.present? && DiscourseKuuMarket.market_category?(topic.category_id)
+      topic.kuu_market_listing = DiscourseKuuMarket::Listing.open(attributes)
+    end
+  end
+
+  # 排在 core 的标题校验之后、valid? 得出结果之前；after_validation 太晚
+  add_model_callback(:topic, :validate) do
+    DiscourseKuuMarket::GeneratedTitle.forgive_title_errors(self)
+  end
+end

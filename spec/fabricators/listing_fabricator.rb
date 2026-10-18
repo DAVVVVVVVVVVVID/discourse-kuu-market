@@ -10,7 +10,7 @@ Fabricator(:kuu_market_listing, class_name: "DiscourseKuuMarket::Listing") do
   price 3000
   location "吉田本校区"
   trade_method "pickup"
-  upload_ids { [Fabricate(:upload).id] }
+  upload_ids { [Fabricate(:upload).tap { |upload| upload.save! if upload.new_record? }.id] }
 end
 
 Fabricator(:kuu_market_buy_listing, from: :kuu_market_listing) do
