@@ -4,3 +4,9 @@ en:
       site_settings:
         categories:
           discourse_kuu_market: "KUU market"
+  js:
+    kuu_market:
+      notifications:
+        expired_sell: "Expired: relist it or mark it as sold"
+        expired_buy: "Expired: keep looking or mark it as closed"
+        expired_title: "Listing expired"

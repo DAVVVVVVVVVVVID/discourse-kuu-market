@@ -64,6 +64,18 @@ module DiscourseKuuMarket
       end
     end
 
+    # 进入在售 / 求购满 kuu_market_expire_days 天的帖子（刚好满的也算）
+    def self.due_to_expire(at: Time.zone.now)
+      joins(:topic)
+        .where(topics: { category_id: SiteSetting.kuu_market_category.to_i, deleted_at: nil })
+        .where(status: ACTIVE_STATUS.values)
+        .where("kuu_market_listings.active_since <= ?", expiry_cutoff(at))
+    end
+
+    def self.expiry_cutoff(at)
+      at - SiteSetting.kuu_market_expire_days.days
+    end
+
     def self.active_status_for(kind)
       ACTIVE_STATUS.fetch(kind.to_s)
     end
@@ -96,6 +108,10 @@ module DiscourseKuuMarket
     def change_status(new_status, at: Time.zone.now)
       self.status = new_status
       self.active_since = at if active?
+    end
+
+    def expiry_due?(at: Time.zone.now)
+      active? && active_since <= self.class.expiry_cutoff(at)
     end
 
     def relisting?

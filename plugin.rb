@@ -9,6 +9,8 @@
 
 enabled_site_setting :kuu_market_enabled
 
+register_svg_icon "clock-rotate-left"
+
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"
 

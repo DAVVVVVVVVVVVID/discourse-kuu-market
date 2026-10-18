@@ -4,3 +4,9 @@ zh_CN:
       site_settings:
         categories:
           discourse_kuu_market: "KUU 二手市场"
+  js:
+    kuu_market:
+      notifications:
+        expired_sell: "已过期，可以重新上架或标记已出"
+        expired_buy: "已过期，可以继续求购或标记结束"
+        expired_title: "二手帖已过期"
