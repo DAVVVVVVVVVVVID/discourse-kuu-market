@@ -49,6 +49,7 @@
   - `d/rspec plugins/discourse-kuu-market/spec`：跑本插件的测试
   - 加了数据库迁移后，先执行 `d/rake db:migrate`，再执行 `RAILS_ENV=test d/rake db:migrate`
   - lint 要在容器里跑：`d/exec bin/lint --fix <文件...>`，路径相对 `~/discourse`
+  - `bin/lint --fix` 先跑 stree 再跑 rubocop，rubocop 自动改出的长行不会再被 stree 格式化，CI 的 `stree check` 会失败。看到 rubocop 有 `corrected` 时再跑一遍 `bin/lint --fix`；推送前可以照 CI 检查一次：`docker exec -u discourse -w /src/plugins/discourse-kuu-market discourse_dev bash -lc 'bundle exec stree check Gemfile $(git ls-files "*.rb")'`
   - 开发环境的邮件在 MailHog 里看：`d/mailhog`，http://localhost:8025
 - `d/` 脚本都用 `docker exec -it`。没有终端时（比如后台运行）会报 `the input device is not a TTY`，这一步直接失败，脚本却显示成功。要用 `script -qec '命令' /dev/null` 包一层
 - 开发服务器发现 `plugins/` 下有变化会自动重启。复制文件、改名改到一半时可能报错，改完再重启一次就好。三个 KUU 插件会同时加载
