@@ -62,5 +62,31 @@ module DiscourseKuuMarket
         end
       end
     end
+
+    def update_status
+      Listing::ChangeStatus.call(service_params) do
+        on_success do |listing:|
+          render json: {
+                   listing: ListingSerializer.new(listing, root: false).as_json,
+                   bumped: listing.saved_change_to_last_bumped_at?,
+                 }
+        end
+        on_failed_contract do |contract|
+          render(
+            json: failed_json.merge(errors: contract.errors.full_messages),
+            status: :bad_request,
+          )
+        end
+        on_model_not_found(:listing) { raise Discourse::NotFound }
+        on_failed_policy(:listing_in_market) { raise Discourse::NotFound }
+        on_failed_policy(:can_change_status) { raise Discourse::InvalidAccess }
+        on_failed_policy(:status_reachable) do
+          render(
+            json: failed_json.merge(errors: [I18n.t("kuu_market.errors.status_unreachable")]),
+            status: :unprocessable_content,
+          )
+        end
+      end
+    end
   end
 end

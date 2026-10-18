@@ -9,7 +9,7 @@ module DiscourseKuuMarket
     model :listing
     params default_values_from: :listing, base_class: Listing::Create::Contract
     policy :listing_in_market
-    policy :can_edit_listing
+    policy :can_edit_listing, class_name: Listing::Policy::CanManage
     policy :kind_unchanged
     policy :photos_available_to_editor
     model :revised_listing, :revise_listing
@@ -25,15 +25,7 @@ module DiscourseKuuMarket
     end
 
     def listing_in_market(listing:)
-      DiscourseKuuMarket.market_category?(listing.topic&.category_id)
-    end
-
-    def can_edit_listing(guardian:, listing:)
-      topic = listing.topic
-      return if guardian.anonymous? || topic.trashed? || !guardian.can_see?(topic)
-      return true if guardian.is_staff?
-
-      topic.user_id == guardian.user.id && !guardian.user.silenced?
+      listing.in_market?
     end
 
     def kind_unchanged(listing:, params:)

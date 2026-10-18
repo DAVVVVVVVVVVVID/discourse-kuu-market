@@ -135,6 +135,63 @@ RSpec.describe DiscourseKuuMarket::Listing do
     end
   end
 
+  describe "#can_change_to?" do
+    it "moves between in progress and ended, and out of expired" do
+      sell = Fabricate.build(:kuu_market_listing, status: "selling")
+      expect(sell.can_change_to?("sold")).to eq(true)
+      expect(sell.can_change_to?("selling")).to eq(false)
+
+      expired = Fabricate.build(:kuu_market_buy_listing, status: "expired")
+      expect(expired.can_change_to?("buying")).to eq(true)
+      expect(expired.can_change_to?("closed")).to eq(true)
+    end
+
+    it "never moves to expired or to the other kind's statuses" do
+      sell = Fabricate.build(:kuu_market_listing, status: "selling")
+
+      expect(sell.can_change_to?("expired")).to eq(false)
+      expect(sell.can_change_to?("closed")).to eq(false)
+    end
+  end
+
+  describe "#change_status" do
+    it "restarts the expiry clock when back in progress" do
+      listing = Fabricate.build(:kuu_market_listing, status: "sold", active_since: 40.days.ago)
+
+      listing.change_status("selling", at: Time.zone.parse("2026-10-18 12:00"))
+
+      expect(listing.active_since).to eq_time(Time.zone.parse("2026-10-18 12:00"))
+    end
+
+    it "keeps the expiry clock when ending" do
+      listing = Fabricate.build(:kuu_market_listing, active_since: 10.days.ago)
+
+      expect { listing.change_status("sold") }.not_to change { listing.active_since }
+    end
+  end
+
+  describe "#bump_due?" do
+    before { SiteSetting.kuu_market_bump_interval_days = 7 }
+
+    it "allows one bump per interval" do
+      freeze_time
+
+      expect(Fabricate.build(:kuu_market_listing, last_bumped_at: 7.days.ago)).to be_bump_due
+      expect(
+        Fabricate.build(:kuu_market_listing, last_bumped_at: 7.days.ago + 1.second),
+      ).not_to be_bump_due
+    end
+  end
+
+  describe "#closes_replies?" do
+    it "is true only for sold and closed listings" do
+      expect(Fabricate.build(:kuu_market_listing, status: "sold")).to be_closes_replies
+      expect(Fabricate.build(:kuu_market_buy_listing, status: "closed")).to be_closes_replies
+      expect(Fabricate.build(:kuu_market_listing, status: "expired")).not_to be_closes_replies
+      expect(Fabricate.build(:kuu_market_listing, status: "selling")).not_to be_closes_replies
+    end
+  end
+
   describe "photos" do
     it "only accepts existing image uploads" do
       SiteSetting.authorized_extensions = "png|pdf"

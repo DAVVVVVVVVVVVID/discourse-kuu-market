@@ -10,6 +10,8 @@ en:
     errors:
       use_market_form: "To post in the market, click \"New Topic\" in the market category and use the sell / buy form."
       kind_unchanged: "A listing cannot switch between selling and buying after it is posted."
+      cannot_manage: "Only the author and staff can change this listing."
+      status_unreachable: "This listing cannot be switched to that status."
       edit_with_market_form: "The title and first post of a listing come from its form. Use the \"Edit\" button on the listing instead."
     listing:
       title:

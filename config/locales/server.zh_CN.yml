@@ -10,6 +10,8 @@ zh_CN:
     errors:
       use_market_form: "二手市场的帖子请在二手市场分类里点「新建话题」，用出售 / 求购表单发布。"
       kind_unchanged: "发帖后不能在出售和求购之间切换。"
+      cannot_manage: "只有作者本人和管理员可以修改这个帖子。"
+      status_unreachable: "这个帖子不能切换到这个状态。"
       edit_with_market_form: "二手帖的标题和第一楼由表单生成，请用帖子上的「修改」按钮修改。"
     listing:
       title:

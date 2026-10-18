@@ -76,6 +76,40 @@ module DiscourseKuuMarket
       status == self.class.active_status_for(kind)
     end
 
+    # 已出、结束：关闭回复。过期不关，东西可能还在，点链接进来的人还能问
+    def closes_replies?
+      status == self.class.ended_status_for(kind)
+    end
+
+    # 移出二手市场的帖子不再受插件管理
+    def in_market?
+      DiscourseKuuMarket.market_category?(topic&.category_id)
+    end
+
+    # 手动只能在进行中和结束之间切换（过期的也能改回这两种）；过期只由系统设置
+    def can_change_to?(new_status)
+      new_status != status &&
+        [self.class.active_status_for(kind), self.class.ended_status_for(kind)].include?(new_status)
+    end
+
+    # 改回进行中时 30 天过期重新计时
+    def change_status(new_status, at: Time.zone.now)
+      self.status = new_status
+      self.active_since = at if active?
+    end
+
+    def relisting?
+      will_save_change_to_status? && active?
+    end
+
+    def next_bump_at
+      last_bumped_at + SiteSetting.kuu_market_bump_interval_days.days
+    end
+
+    def bump_due?(at: Time.zone.now)
+      next_bump_at <= at
+    end
+
     private
 
     def status_matches_kind
