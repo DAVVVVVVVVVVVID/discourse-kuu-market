@@ -28,6 +28,26 @@ after_initialize do
                   autosave: true
   end
 
+  # 移出二手市场的帖子不再受插件管理：没有类型和状态
+  add_to_class(:topic, :kuu_market_listing_in_market) do
+    kuu_market_listing if DiscourseKuuMarket.market_category?(category_id)
+  end
+
+  register_topic_preloader_associations(:kuu_market_listing) { SiteSetting.kuu_market_enabled }
+
+  # 列表卡片的书签样式由 KUU 自定义组件按这两个值加的类名来写
+  add_to_serializer(
+    :topic_list_item,
+    :kuu_market_kind,
+    include_condition: -> { object.kuu_market_listing_in_market.present? },
+  ) { object.kuu_market_listing_in_market.kind }
+
+  add_to_serializer(
+    :topic_list_item,
+    :kuu_market_status,
+    include_condition: -> { object.kuu_market_listing_in_market.present? },
+  ) { object.kuu_market_listing_in_market.status }
+
   NewPostManager.add_handler(100) { |manager| DiscourseKuuMarket::NewTopicRules.check(manager) }
 
   # 需要审核的帖子，批准时由 core 按审核记录里存的参数建帖

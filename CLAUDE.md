@@ -55,6 +55,13 @@
 - 开发服务器发现 `plugins/` 下有变化会自动重启。复制文件、改名改到一半时可能报错，改完再重启一次就好。三个 KUU 插件会同时加载
 - 改了 `plugin.rb` 或 `lib/` 之后，开发服务器重载可能留下孤儿 worker 或丢掉 `after_initialize` 里注册的东西（评分插件那边见过）。现象怪异时重启 `d/dev`
 - system spec 的 Playwright 浏览器缺失、样式缓存不更新等问题，处理方法见评分插件的 `CLAUDE.md`
+- system spec 和 QUnit 都要前端构建：`d/dev` 开着时用它的 Rolldown；没开时 system spec 会报 `Frontend build error`（`frontend/discourse/dist/manifest/build.json` 里的进程已经不在）
+- QUnit：容器里没装 Chrome，借用 Playwright 的 Chromium（做法见 `discourse-kuu-new-topic` 的 `CLAUDE.md`），`d/dev` 没开时加 `--standalone`。浏览器偶尔启动后 30 秒没进展而失败，加 `-e QUNIT_BROWSER_INACTIVITY_TIMEOUT=180` 重跑：
+  ```bash
+  docker exec -u discourse -w /src -e DISCOURSE_DISABLE_BROWSER_SANDBOX=1 -e QUNIT_BROWSER_INACTIVITY_TIMEOUT=180 discourse_dev bash -lc \
+    'export PATH=/src/tmp/kuu-chrome-bin:$PATH; bin/qunit --standalone plugins/discourse-kuu-market/test/javascripts'
+  ```
+- 测试库只有一个：不要同时跑两组 rspec（会死锁）
 - `plugin.rb` 的 `required_version` 保持 `2026.1.0`，**不要写当前版本号**：开发环境和线上都是 `2026.10.0-latest`，按版本比较规则它比 `2026.10.0` 低。写高了插件不会被激活，设置却照样加载，Rails 启动时报 `undefined method 'configurable?' for nil`
 - 插件总开关是站点设置 `kuu_market_enabled`，默认关闭，开发环境要在后台打开
 
