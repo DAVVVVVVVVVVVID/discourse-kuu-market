@@ -6,3 +6,25 @@ zh_CN:
     kuu_market_bump_interval_days: "重新上架时把帖子顶回「最新」的最短间隔（天）。间隔内重新上架照样能改状态，只是不顶帖。"
     kuu_market_max_photos: "出售帖最多能放几张照片。"
     kuu_market_locations: "表单里「交易地点」的选项。表单另外固定有「其他」，选它时手填。"
+  kuu_market:
+    listing:
+      title:
+        sell: "【出售】%{item} · %{price}"
+        free: "【赠送】%{item}"
+        buy: "【求购】%{item} · %{budget}"
+      yen: "¥%{amount}"
+      budget:
+        range: "¥%{min}–%{max}"
+        up_to: "%{max} 以内"
+        from: "%{min} 以上"
+      free: "免费赠送"
+      field_line: "- **%{label}**：%{value}"
+      fields:
+        price: "价格"
+        budget: "预算"
+        location: "交易地点"
+        trade_method: "交易方式"
+      trade_methods:
+        pickup: "自取"
+        delivery: "可送"
+        negotiable: "可商议"

@@ -6,3 +6,25 @@ en:
     kuu_market_bump_interval_days: "Minimum days between bumps to the top of Latest when a listing is relisted. Relisting within this interval still changes the status, without the bump."
     kuu_market_max_photos: "Maximum number of photos on a sell listing."
     kuu_market_locations: "Options for the meeting place in the form. The form always adds \"Other\", which lets the user type a place."
+  kuu_market:
+    listing:
+      title:
+        sell: "[For sale] %{item} · %{price}"
+        free: "[Free] %{item}"
+        buy: "[Wanted] %{item} · %{budget}"
+      yen: "¥%{amount}"
+      budget:
+        range: "¥%{min}–%{max}"
+        up_to: "up to %{max}"
+        from: "%{min} or more"
+      free: "Free"
+      field_line: "- **%{label}:** %{value}"
+      fields:
+        price: "Price"
+        budget: "Budget"
+        location: "Meeting place"
+        trade_method: "Handover"
+      trade_methods:
+        pickup: "Pick up"
+        delivery: "Can deliver"
+        negotiable: "Negotiable"
