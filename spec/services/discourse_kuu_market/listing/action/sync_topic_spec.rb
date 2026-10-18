@@ -112,6 +112,32 @@ RSpec.describe DiscourseKuuMarket::Listing::Action::SyncTopic do
     end
   end
 
+  context "when a sold listing is moved out of the market" do
+    before do
+      change_status_to("sold")
+      described_class.call(listing:)
+      listing.save!
+      listing.topic.update_columns(category_id: Fabricate(:category).id)
+    end
+
+    it "undoes its own closing and hiding" do
+      sync
+
+      expect(topic.reload).to have_attributes(closed: false, visible: true)
+      expect(listing).to have_attributes(closed_by_plugin: false, unlisted_by_plugin: false)
+    end
+
+    it "closes and hides it again once moved back" do
+      sync
+      listing.save!
+      listing.topic.update_columns(category_id: market.id)
+
+      described_class.call(listing:)
+
+      expect(topic.reload).to have_attributes(closed: true, visible: false)
+    end
+  end
+
   context "when staff closed the topic" do
     before { topic.update!(closed: true) }
 

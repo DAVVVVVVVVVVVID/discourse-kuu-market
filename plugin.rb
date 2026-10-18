@@ -63,6 +63,10 @@ after_initialize do
     end
   end
 
+  on(:topic_category_changed) do |topic, _old_category|
+    DiscourseKuuMarket::Listing::FollowCategoryChange.call(params: { topic_id: topic.id })
+  end
+
   # 排在 core 的标题校验之后、valid? 得出结果之前；after_validation 太晚
   add_model_callback(:topic, :validate) do
     DiscourseKuuMarket::FormSubmission.forgive_title_errors(self)
