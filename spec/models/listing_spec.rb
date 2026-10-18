@@ -192,6 +192,28 @@ RSpec.describe DiscourseKuuMarket::Listing do
     end
   end
 
+  describe ".photos_usable_by?" do
+    fab!(:user)
+
+    it "accepts the user's own uploads and anyone's public uploads" do
+      own = Fabricate(:upload, user:, secure: true)
+      public_upload = Fabricate(:upload)
+
+      expect(described_class.photos_usable_by?(user, [own.id, public_upload.id])).to eq(true)
+    end
+
+    it "rejects someone else's secure uploads and missing ones" do
+      secure = Fabricate(:upload, secure: true)
+
+      expect(described_class.photos_usable_by?(user, [secure.id])).to eq(false)
+      expect(described_class.photos_usable_by?(user, [-42])).to eq(false)
+    end
+
+    it "accepts no photos" do
+      expect(described_class.photos_usable_by?(user, [])).to eq(true)
+    end
+  end
+
   describe "photos" do
     it "only accepts existing image uploads" do
       SiteSetting.authorized_extensions = "png|pdf"

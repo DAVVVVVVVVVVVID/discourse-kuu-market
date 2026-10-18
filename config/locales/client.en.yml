@@ -6,6 +6,52 @@ en:
           discourse_kuu_market: "KUU market"
   js:
     kuu_market:
+      new_topic:
+        label: "Sell / buy"
+        description: "Post with the market form"
+      kinds:
+        sell: "Sell"
+        buy: "Buy"
+      trade_methods:
+        pickup: "Pick up"
+        delivery: "Can deliver"
+        negotiable: "Negotiable"
+      form:
+        new_title: "New listing"
+        edit_title: "Edit listing"
+        kind: "Type"
+        item_name: "Item"
+        item_name_placeholder: "e.g. IKEA desk"
+        free: "Free"
+        price: "Price (yen)"
+        budget: "Budget"
+        budget_min: "Minimum budget (yen)"
+        budget_max: "Maximum budget (yen)"
+        location: "Meeting place"
+        other_location: "Other"
+        location_other: "Place"
+        trade_method: "Handover"
+        description: "Details"
+        privacy_hint: "Don't include phone numbers or home addresses; use private messages"
+        photos: "Photos"
+        reference_photo: "Reference photo (optional)"
+        photos_hint:
+          one: "Up to %{count} photo"
+          other: "Up to %{count} photos; the first one is the cover"
+        add_photos: "Add photos"
+        cover: "Cover"
+        make_cover: "Make cover"
+        remove_photo: "Remove this photo"
+        publish: "Publish"
+        save: "Save"
+        pending_approval: "Submitted. It will be published once staff approve it."
+        errors:
+          required: "Required"
+          budget_required: "Fill in at least one end of the budget"
+          budget_order: "The maximum cannot be lower than the minimum"
+          too_many_photos: "Up to %{count}"
+      panel:
+        edit: "Edit"
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"

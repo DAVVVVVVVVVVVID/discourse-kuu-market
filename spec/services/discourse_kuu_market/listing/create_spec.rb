@@ -130,10 +130,16 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
       it { is_expected.to fail_a_policy(:can_create_topic_in_category) }
     end
 
-    context "when a photo was uploaded by another user" do
+    context "when a photo is someone else's secure upload" do
+      fab!(:photo) { Fabricate(:image_upload, user: Fabricate(:user), secure: true) }
+
+      it { is_expected.to fail_a_policy(:photos_available_to_user) }
+    end
+
+    context "when a photo is someone else's public upload" do
       fab!(:photo) { Fabricate(:image_upload, user: Fabricate(:user)) }
 
-      it { is_expected.to fail_a_policy(:photos_uploaded_by_user) }
+      it { is_expected.to run_successfully }
     end
 
     context "when the listing is invalid" do

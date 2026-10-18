@@ -39,7 +39,7 @@ module DiscourseKuuMarket
 
     model :category
     policy :can_create_topic_in_category
-    policy :photos_uploaded_by_user
+    policy :photos_available_to_user
     model :listing, :open_listing
 
     try(RateLimiter::LimitExceeded) { step :publish_listing }
@@ -54,9 +54,8 @@ module DiscourseKuuMarket
       guardian.can_create_topic_on_category?(category)
     end
 
-    # 不能把别人上传的图片（比如私密分类里的）引用进自己的帖子
-    def photos_uploaded_by_user(guardian:, params:)
-      Upload.where(id: params.upload_ids, user: guardian.user).count == params.upload_ids.uniq.size
+    def photos_available_to_user(guardian:, params:)
+      Listing.photos_usable_by?(guardian.user, params.upload_ids)
     end
 
     def open_listing(params:)

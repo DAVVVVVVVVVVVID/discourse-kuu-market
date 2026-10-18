@@ -32,10 +32,9 @@ module DiscourseKuuMarket
       params.kind == listing.kind
     end
 
-    # 原来的照片可以留着（管理员修改别人的帖子时也一样），新加的必须是编辑者自己上传的
+    # 原来的照片可以留着（管理员修改别人的帖子时也一样），只检查新加的
     def photos_available_to_editor(guardian:, listing:, params:)
-      added_ids = params.upload_ids.uniq - listing.upload_ids
-      Upload.where(id: added_ids, user: guardian.user).count == added_ids.size
+      Listing.photos_usable_by?(guardian.user, params.upload_ids - listing.upload_ids)
     end
 
     def revise_listing(listing:, params:)

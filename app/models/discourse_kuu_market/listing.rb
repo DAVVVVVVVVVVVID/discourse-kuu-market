@@ -76,6 +76,16 @@ module DiscourseKuuMarket
       at - SiteSetting.kuu_market_expire_days.days
     end
 
+    # Discourse 按文件内容去重，同一张图别人传过时拿到的是别人的上传记录，所以公开的上传谁都能用。
+    # 私密分类里的图（secure）只能用自己传的，不能借二手帖把它公开出去
+    def self.photos_usable_by?(user, upload_ids)
+      upload_ids = upload_ids.uniq
+      Upload
+        .where(id: upload_ids)
+        .where("uploads.user_id = :user_id OR NOT uploads.secure", user_id: user.id)
+        .count == upload_ids.size
+    end
+
     def self.active_status_for(kind)
       ACTIVE_STATUS.fetch(kind.to_s)
     end

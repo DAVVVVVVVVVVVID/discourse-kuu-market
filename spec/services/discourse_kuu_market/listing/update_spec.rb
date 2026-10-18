@@ -117,7 +117,7 @@ RSpec.describe DiscourseKuuMarket::Listing::Update do
     end
 
     context "with a new photo uploaded by someone else" do
-      fab!(:other_photo, :image_upload)
+      fab!(:other_photo) { Fabricate(:image_upload, secure: true) }
 
       let(:upload_ids) { [photo.id, other_photo.id] }
 

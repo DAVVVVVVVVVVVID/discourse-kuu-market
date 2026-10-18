@@ -18,7 +18,7 @@ module DiscourseKuuMarket
         end
         on_model_not_found(:category) { raise Discourse::NotFound }
         on_failed_policy(:can_create_topic_in_category) { raise Discourse::InvalidAccess }
-        on_failed_policy(:photos_uploaded_by_user) { raise Discourse::InvalidAccess }
+        on_failed_policy(:photos_available_to_user) { raise Discourse::InvalidAccess }
         on_model_errors(:listing) do |listing|
           render(
             json: failed_json.merge(errors: listing.errors.full_messages),

@@ -9,7 +9,10 @@
 
 enabled_site_setting :kuu_market_enabled
 
+register_asset "stylesheets/common/kuu-market.scss"
+
 register_svg_icon "clock-rotate-left"
+register_svg_icon "cart-shopping"
 
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"
@@ -36,6 +39,27 @@ after_initialize do
   end
 
   register_topic_preloader_associations(:kuu_market_listing) { SiteSetting.kuu_market_enabled }
+
+  # 作者本人和管理员可以随时修改二手帖、切换状态，不受编辑时限限制；作者被禁言时不行
+  add_to_class(:guardian, :can_manage_kuu_market_listing?) do |listing|
+    topic = listing.topic
+    return false if anonymous? || topic.nil? || topic.trashed? || !can_see?(topic)
+    return true if is_staff?
+
+    topic.user_id == user.id && !user.silenced?
+  end
+
+  add_to_serializer(
+    :topic_view,
+    :kuu_market_listing,
+    include_condition: -> { object.topic.kuu_market_listing_in_market.present? },
+  ) do
+    DiscourseKuuMarket::TopicListingSerializer.new(
+      object.topic.kuu_market_listing_in_market,
+      scope:,
+      root: false,
+    ).as_json
+  end
 
   # 列表卡片的书签样式由 KUU 自定义组件按这两个值加的类名来写
   add_to_serializer(

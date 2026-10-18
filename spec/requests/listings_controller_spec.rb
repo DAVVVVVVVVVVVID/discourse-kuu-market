@@ -104,8 +104,8 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
         expect(response.parsed_body["errors"].size).to eq(2)
       end
 
-      it "rejects photos uploaded by someone else" do
-        stranger_photo = Fabricate(:image_upload)
+      it "rejects someone else's secure photos" do
+        stranger_photo = Fabricate(:image_upload, secure: true)
 
         post "/kuu-market/listings.json", params: sell_params.merge(upload_ids: [stranger_photo.id])
 

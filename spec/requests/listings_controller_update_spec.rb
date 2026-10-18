@@ -110,8 +110,8 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
         expect(listing.reload.upload_ids).to eq([photo.id])
       end
 
-      it "cannot add someone else's photo" do
-        update_listing(update_params.merge(upload_ids: [Fabricate(:image_upload).id]))
+      it "cannot add someone else's secure photo" do
+        update_listing(update_params.merge(upload_ids: [Fabricate(:image_upload, secure: true).id]))
 
         expect(response.status).to eq(403)
       end

@@ -6,6 +6,52 @@ zh_CN:
           discourse_kuu_market: "KUU 二手市场"
   js:
     kuu_market:
+      new_topic:
+        label: "出售 / 求购"
+        description: "用二手市场的表单发布"
+      kinds:
+        sell: "出售"
+        buy: "求购"
+      trade_methods:
+        pickup: "自取"
+        delivery: "可送"
+        negotiable: "可商议"
+      form:
+        new_title: "发布二手帖"
+        edit_title: "修改二手帖"
+        kind: "类型"
+        item_name: "物品名称"
+        item_name_placeholder: "例：宜家书桌"
+        free: "免费赠送"
+        price: "价格（日元）"
+        budget: "预算"
+        budget_min: "最低预算（日元）"
+        budget_max: "最高预算（日元）"
+        location: "交易地点"
+        other_location: "其他"
+        location_other: "具体地点"
+        trade_method: "交易方式"
+        description: "补充说明"
+        privacy_hint: "不要填手机号、详细住址，请用私信联系"
+        photos: "照片"
+        reference_photo: "参考图（选填）"
+        photos_hint:
+          one: "最多 %{count} 张"
+          other: "最多 %{count} 张，第一张做封面"
+        add_photos: "添加照片"
+        cover: "封面"
+        make_cover: "设为封面"
+        remove_photo: "删除这张照片"
+        publish: "发布"
+        save: "保存"
+        pending_approval: "已提交，管理员审核通过后就会发布。"
+        errors:
+          required: "必填"
+          budget_required: "最低、最高预算至少填一个"
+          budget_order: "最高预算不能低于最低预算"
+          too_many_photos: "最多 %{count} 张"
+      panel:
+        edit: "修改"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"
