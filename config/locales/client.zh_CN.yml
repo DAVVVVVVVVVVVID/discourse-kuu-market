@@ -7,8 +7,8 @@ zh_CN:
   js:
     kuu_market:
       new_topic:
-        label: "出售 / 求购"
-        description: "用二手市场的表单发布"
+        label: "二手出售 / 求购"
+        description: "出售、赠送或求购二手物品"
       kinds:
         sell: "出售"
         buy: "求购"

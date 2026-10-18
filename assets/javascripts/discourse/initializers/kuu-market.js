@@ -1,5 +1,6 @@
 import CustomNotification from "discourse/lib/notification-types/custom";
 import { withPluginApi } from "discourse/lib/plugin-api";
+import Category from "discourse/models/category";
 import { i18n } from "discourse-i18n";
 import ListingPanel from "../components/kuu-market/listing-panel";
 import ListingForm from "../components/kuu-market/modal/listing-form";
@@ -19,13 +20,17 @@ export default {
     const modal = container.lookup("service:modal");
 
     // 「新建话题」按钮由 discourse-kuu-new-topic 统一处理：在二手市场分类里直接打开表单，
-    // 不出现在其他地方的选择框里（2026-10-18 David 定）
+    // 其他地方出现在选择框里（2026-10-19 David 定）。不管从哪里打开，帖子都发到二手市场分类。
+    // 排在评分主题前面；在二手市场没有发帖权限的人看不到这一项
     container.lookup("service:kuu-new-topic")?.register({
       id: "kuu-market-listing",
       label: "kuu_market.new_topic.label",
       description: "kuu_market.new_topic.description",
       icon: "cart-shopping",
       categoryIds: () => [marketCategoryId(siteSettings)].filter(Boolean),
+      inChooser: () =>
+        !!Category.findById(marketCategoryId(siteSettings))?.canCreateTopic,
+      order: -1,
       open: () => modal.show(ListingForm, { model: {} }),
     });
 

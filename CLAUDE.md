@@ -32,7 +32,7 @@
 15. 已出、结束、过期的帖子，作者本人和管理员默认也搜不到（用的是 core 的隐藏话题）；作者个人主页上的话题数会相应变少。这两点 David 已接受
 
 ## 「新建话题」按钮
-- 由插件 `discourse-kuu-new-topic`（`~/discourse/plugins/discourse-kuu-new-topic`）统一处理，本插件**不要**自己注册 `create-topic-button-click` / `can-create-topic-button` 转换器，只向它登记类型：只在二手市场分类里直接打开表单，不出现在其他地方的选择框里
+- 由插件 `discourse-kuu-new-topic`（`~/discourse/plugins/discourse-kuu-new-topic`）统一处理，本插件**不要**自己注册 `create-topic-button-click` / `can-create-topic-button` 转换器，只向它登记类型：在二手市场分类里直接打开表单，其他地方出现在选择框里（2026-10-19 David 改；之前是不进选择框），帖子一律发到二手市场分类
 - 它是硬依赖：`about.json` 里声明了 CI 测试时一起安装；部署时要一起装
 - 登记接口见它的 README
 

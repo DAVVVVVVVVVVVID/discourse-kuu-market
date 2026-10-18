@@ -7,8 +7,8 @@ en:
   js:
     kuu_market:
       new_topic:
-        label: "Sell / buy"
-        description: "Post with the market form"
+        label: "Sell / buy secondhand"
+        description: "Sell, give away or look for secondhand items"
       kinds:
         sell: "Sell"
         buy: "Buy"
