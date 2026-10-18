@@ -196,6 +196,7 @@ RSpec.describe "Who sees listings that are no longer in progress" do
       expect(items[selling.id]).to include(
         "kuu_market_kind" => "sell",
         "kuu_market_status" => "selling",
+        "kuu_market_title_prefix" => "【出售】",
       )
       expect(items[sold.id]).to include("kuu_market_status" => "sold")
       expect(items[other_topic.id]).not_to have_key("kuu_market_kind")

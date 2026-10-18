@@ -1,3 +1,19 @@
+// 二手帖标题开头的【出售】【赠送】【求购】。颜色和列表卡片的状态标签一致，主题组件可以覆盖
+:root {
+  --kuu-market-title-sell-color: #1e7b3c;
+  --kuu-market-title-buy-color: #1f5fa8;
+}
+
+.kuu-market-title-prefix {
+  &--sell {
+    color: var(--kuu-market-title-sell-color);
+  }
+
+  &--buy {
+    color: var(--kuu-market-title-buy-color);
+  }
+}
+
 .kuu-market-photos {
   display: flex;
   flex-direction: column;

@@ -1,3 +1,5 @@
+import { escapeExpression } from "discourse/lib/utilities";
+
 // 和后端 DiscourseKuuMarket::Listing 的限制保持一致
 export const ITEM_NAME_MAX_LENGTH = 40;
 export const LOCATION_MAX_LENGTH = 40;
@@ -68,4 +70,20 @@ export function payloadFrom(data) {
     budget_min: data.budget_min,
     budget_max: data.budget_max,
   };
+}
+
+// fancyHtml 是 core 转义过的标题 HTML。标题确实以插件生成的前缀开头时，把前缀包成单独上色的元素；
+// 不是的话（比如管理员手动改过标题）原样返回
+export function titleWithColoredPrefix(fancyHtml, prefix, kind) {
+  if (!fancyHtml || !prefix || !kind) {
+    return fancyHtml;
+  }
+
+  const escapedPrefix = escapeExpression(prefix);
+  if (!fancyHtml.startsWith(escapedPrefix)) {
+    return fancyHtml;
+  }
+
+  const kindClass = kind === "buy" ? "buy" : "sell";
+  return `<span class="kuu-market-title-prefix kuu-market-title-prefix--${kindClass}">${escapedPrefix}</span>${fancyHtml.slice(escapedPrefix.length)}`;
 }

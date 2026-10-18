@@ -4,7 +4,7 @@ import Category from "discourse/models/category";
 import { i18n } from "discourse-i18n";
 import ListingPanel from "../components/kuu-market/listing-panel";
 import ListingForm from "../components/kuu-market/modal/listing-form";
-import { marketCategoryId } from "../lib/kuu-market";
+import { marketCategoryId, titleWithColoredPrefix } from "../lib/kuu-market";
 
 const EXPIRED_MESSAGE = "kuu_market.notifications.expired";
 
@@ -36,6 +36,23 @@ export default {
 
     withPluginApi((api) => {
       api.renderInOutlet("topic-above-posts", ListingPanel);
+
+      // 标题开头的【出售】【赠送】【求购】单独上色（2026-10-19 David 定）。只有带着插件数据的话题
+      // （话题列表、帖子页）才改；搜索结果、推荐话题等地方的话题没有这些数据，保持纯文字
+      api.modifyClass(
+        "model:topic",
+        (Superclass) =>
+          class extends Superclass {
+            get fancyTitle() {
+              const listing = this.kuu_market_listing;
+              return titleWithColoredPrefix(
+                super.fancyTitle,
+                this.kuu_market_title_prefix ?? listing?.title_prefix,
+                this.kuu_market_kind ?? listing?.kind
+              );
+            }
+          }
+      );
 
       // 第一楼由表单生成，作者用「修改」按钮改；管理员保留普通编辑
       api.registerValueTransformer(

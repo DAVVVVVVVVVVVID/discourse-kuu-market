@@ -5,6 +5,7 @@ module DiscourseKuuMarket
   # 邮件通知、搜索、RSS 和插件关掉以后都靠它显示
   class ListingRenderer
     MARKDOWN_SPECIAL_CHARS = /([\\`*_{}\[\]<>()#+\-.!|~])/
+    PREFIX_MARKER = "\u0000"
 
     def initialize(listing)
       @listing = listing
@@ -12,13 +13,23 @@ module DiscourseKuuMarket
 
     def title
       in_site_locale do
-        if @listing.buy?
+        case title_key
+        when "buy"
           t("title.buy", item: @listing.item_name, budget: budget)
-        elsif @listing.free
+        when "free"
           t("title.free", item: @listing.item_name)
         else
           t("title.sell", item: @listing.item_name, price: yen(@listing.price))
         end
+      end
+    end
+
+    # 标题开头的「【出售】」「【赠送】」「【求购】」，前端拿它把前缀单独上色
+    def title_prefix
+      in_site_locale do
+        t("title.#{title_key}", item: PREFIX_MARKER, price: "", budget: "").split(
+          PREFIX_MARKER,
+        ).first
       end
     end
 
@@ -29,6 +40,11 @@ module DiscourseKuuMarket
     end
 
     private
+
+    def title_key
+      return "buy" if @listing.buy?
+      @listing.free ? "free" : "sell"
+    end
 
     def photos_markdown
       uploads = Upload.where(id: @listing.upload_ids).index_by(&:id)

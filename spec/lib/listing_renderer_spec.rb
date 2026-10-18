@@ -68,6 +68,35 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
     end
   end
 
+  describe "#title_prefix" do
+    it "is the beginning of each kind of generated title" do
+      expect(described_class.new(Fabricate.build(:kuu_market_listing)).title_prefix).to eq("【出售】")
+      expect(
+        described_class.new(
+          Fabricate.build(:kuu_market_listing, price: nil, free: true),
+        ).title_prefix,
+      ).to eq("【赠送】")
+      expect(described_class.new(Fabricate.build(:kuu_market_buy_listing)).title_prefix).to eq(
+        "【求购】",
+      )
+    end
+
+    it "uses the site language" do
+      SiteSetting.default_locale = "en"
+
+      expect(described_class.new(Fabricate.build(:kuu_market_listing)).title_prefix).to eq(
+        "[For sale] ",
+      )
+    end
+
+    it "matches the start of the title" do
+      %i[kuu_market_listing kuu_market_buy_listing].each do |fabricator|
+        renderer = described_class.new(Fabricate.build(fabricator))
+        expect(renderer.title).to start_with(renderer.title_prefix)
+      end
+    end
+  end
+
   describe "#raw" do
     context "when selling" do
       let(:listing) do

@@ -3,7 +3,11 @@
 module DiscourseKuuMarket
   # 帖子页用：状态显示、切换按钮，以及修改表单回填的字段和照片
   class TopicListingSerializer < ListingSerializer
-    attributes :photos, :can_manage, :statuses_reachable, :expires_at
+    attributes :photos, :can_manage, :statuses_reachable, :expires_at, :title_prefix
+
+    def title_prefix
+      ListingRenderer.new(object).title_prefix
+    end
 
     def expires_at
       object.active_since + SiteSetting.kuu_market_expire_days.days

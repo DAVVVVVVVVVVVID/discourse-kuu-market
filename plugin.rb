@@ -74,6 +74,13 @@ after_initialize do
     include_condition: -> { object.kuu_market_listing_in_market.present? },
   ) { object.kuu_market_listing_in_market.status }
 
+  # 列表标题开头的前缀单独上色用
+  add_to_serializer(
+    :topic_list_item,
+    :kuu_market_title_prefix,
+    include_condition: -> { object.kuu_market_listing_in_market.present? },
+  ) { DiscourseKuuMarket::ListingRenderer.new(object.kuu_market_listing_in_market).title_prefix }
+
   NewPostManager.add_handler(100) { |manager| DiscourseKuuMarket::NewTopicRules.check(manager) }
 
   # 需要审核的帖子，批准时由 core 按审核记录里存的参数建帖
