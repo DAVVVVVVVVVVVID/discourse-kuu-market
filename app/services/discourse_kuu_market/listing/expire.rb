@@ -34,7 +34,7 @@ module DiscourseKuuMarket
     end
 
     def listing_in_market(listing:)
-      listing.in_market? && !listing.topic.trashed?
+      listing.in_market? && !listing.topic_deleted?
     end
 
     def expiry_due(listing:)

@@ -62,6 +62,7 @@
     'export PATH=/src/tmp/kuu-chrome-bin:$PATH; bin/qunit --standalone plugins/discourse-kuu-market/test/javascripts'
   ```
 - 测试库只有一个：不要同时跑两组 rspec（会死锁）
+- **内存**：WSL 只有约 4.9GB。`d/dev` 默认 3 个 Rails worker，加上 Rolldown（约 2GB），开起来就只剩几百 MB，再开浏览器（截图、system spec、QUnit）会被系统强杀（退出码 137），Rails 日志里出现 `can't alloc thread`。开发时用 1 个 worker 启动：`script -qec 'docker exec -it -u discourse -w /src -e UNICORN_WORKERS=1 discourse_dev bin/dev' /dev/null`，浏览器一次只开一个
 - `plugin.rb` 的 `required_version` 保持 `2026.1.0`，**不要写当前版本号**：开发环境和线上都是 `2026.10.0-latest`，按版本比较规则它比 `2026.10.0` 低。写高了插件不会被激活，设置却照样加载，Rails 启动时报 `undefined method 'configurable?' for nil`
 - 插件总开关是站点设置 `kuu_market_enabled`，默认关闭，开发环境要在后台打开
 

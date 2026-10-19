@@ -82,6 +82,20 @@ RSpec.describe "Coloured prefix at the start of listing titles" do
     expect(list_title(topic)).to have_no_css(".kuu-market-title-prefix")
   end
 
+  it "keeps the topic page prefix right after the seller edits the listing" do
+    topic = post_listing(item_name: "Desk", price: 3000)
+    sign_in(seller)
+    topic_page.visit_topic(topic)
+    expect(page).to have_css("#topic-title .fancy-title .kuu-market-title-prefix--sell")
+
+    find(".kuu-market-panel__edit").click
+    PageObjects::Modals::KuuMarketListingForm.new.fill_in("price", "2000").submit
+
+    expect(page).to have_css("#topic-title .fancy-title", text: "【出售】Desk · ¥2,000")
+    expect(page).to have_css("#topic-title .fancy-title .kuu-market-title-prefix", count: 1)
+    expect(find("#topic-title .fancy-title").text).not_to include("【出售】【出售】")
+  end
+
   it "colours the prefix of the title on the topic page" do
     topic =
       post_listing(

@@ -72,18 +72,22 @@ export function payloadFrom(data) {
   };
 }
 
-// fancyHtml 是 core 转义过的标题 HTML。标题确实以插件生成的前缀开头时，把前缀包成单独上色的元素；
-// 不是的话（比如管理员手动改过标题）原样返回
-export function titleWithColoredPrefix(fancyHtml, prefix, kind) {
-  if (!fancyHtml || !prefix || !kind) {
-    return fancyHtml;
+// 标题开头【出售】【赠送】【求购】的上色元素用的类名。只跟类型走，不随状态变（2026-10-19 David 定）
+export function titlePrefixClass(kind) {
+  return `kuu-market-title-prefix kuu-market-title-prefix--${kind === "buy" ? "buy" : "sell"}`;
+}
+
+// fancyHtml 是 core 转义过的标题 HTML。标题确实以插件生成的前缀开头时，返回拆开的前缀（纯文字）
+// 和其余部分（HTML）；不是的话（比如管理员手动改过标题）返回 null，照 core 原样显示
+export function splitTitlePrefix(fancyHtml, prefix) {
+  if (!fancyHtml || !prefix) {
+    return null;
   }
 
   const escapedPrefix = escapeExpression(prefix);
   if (!fancyHtml.startsWith(escapedPrefix)) {
-    return fancyHtml;
+    return null;
   }
 
-  const kindClass = kind === "buy" ? "buy" : "sell";
-  return `<span class="kuu-market-title-prefix kuu-market-title-prefix--${kindClass}">${escapedPrefix}</span>${fancyHtml.slice(escapedPrefix.length)}`;
+  return { prefix, rest: fancyHtml.slice(escapedPrefix.length) };
 }

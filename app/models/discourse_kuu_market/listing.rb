@@ -64,10 +64,11 @@ module DiscourseKuuMarket
       end
     end
 
-    # 进入在售 / 求购满 kuu_market_expire_days 天的帖子（刚好满的也算）
+    # 进入在售 / 求购满 kuu_market_expire_days 天的帖子（刚好满的也算）。已删除的帖子不算（见 #topic_deleted?）
     def self.due_to_expire(at: Time.zone.now)
       joins(:topic)
         .where(topics: { category_id: SiteSetting.kuu_market_category.to_i, deleted_at: nil })
+        .where.not(topic_id: Post.where(post_number: 1, user_deleted: true).select(:topic_id))
         .where(status: ACTIVE_STATUS.values)
         .where("kuu_market_listings.active_since <= ?", expiry_cutoff(at))
     end
@@ -101,6 +102,12 @@ module DiscourseKuuMarket
     # 已出、结束：关闭回复。过期不关，东西可能还在，点链接进来的人还能问
     def closes_replies?
       status == self.class.ended_status_for(kind)
+    end
+
+    # 删帖时记录保留，恢复帖子时原样回来；删掉期间插件不碰它。作者自己删帖时 core 先标记第一楼、
+    # 过一段时间才真正删除话题，这段时间也算已删除。永久删除话题时记录随话题删除（Topic has_one）
+    def topic_deleted?
+      topic.nil? || topic.trashed? || !!topic.first_post&.user_deleted
     end
 
     # 移出二手市场的帖子不再受插件管理

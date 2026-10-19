@@ -1,43 +1,43 @@
 import { setupTest } from "ember-qunit";
 import { module, test } from "qunit";
-import { titleWithColoredPrefix } from "discourse/plugins/discourse-kuu-market/discourse/lib/kuu-market";
+import {
+  splitTitlePrefix,
+  titlePrefixClass,
+} from "discourse/plugins/discourse-kuu-market/discourse/lib/kuu-market";
 
-module("Unit | KUU market | titleWithColoredPrefix", function (hooks) {
+module("Unit | KUU market | title prefix", function (hooks) {
   setupTest(hooks);
 
-  test("wraps the generated prefix of a sell listing", function (assert) {
-    assert.strictEqual(
-      titleWithColoredPrefix("【出售】宜家书桌 · ¥3,000", "【出售】", "sell"),
-      '<span class="kuu-market-title-prefix kuu-market-title-prefix--sell">【出售】</span>宜家书桌 · ¥3,000'
-    );
-  });
-
-  test("colours buy listings differently", function (assert) {
-    assert.true(
-      titleWithColoredPrefix("【求购】自行车", "【求购】", "buy").includes(
-        "kuu-market-title-prefix--buy"
-      )
+  test("splits the generated prefix off the title", function (assert) {
+    assert.deepEqual(
+      splitTitlePrefix("【出售】宜家书桌 · ¥3,000", "【出售】"),
+      { prefix: "【出售】", rest: "宜家书桌 · ¥3,000" }
     );
   });
 
   test("compares against the escaped prefix", function (assert) {
-    assert.strictEqual(
-      titleWithColoredPrefix("&lt;Sale&gt; Desk", "<Sale> ", "sell"),
-      '<span class="kuu-market-title-prefix kuu-market-title-prefix--sell">&lt;Sale&gt; </span>Desk'
-    );
+    assert.deepEqual(splitTitlePrefix("&lt;Sale&gt; Desk", "<Sale> "), {
+      prefix: "<Sale> ",
+      rest: "Desk",
+    });
   });
 
   test("leaves titles that do not start with the prefix alone", function (assert) {
     assert.strictEqual(
-      titleWithColoredPrefix("Desk renamed by staff", "【出售】", "sell"),
-      "Desk renamed by staff"
+      splitTitlePrefix("Desk renamed by staff", "【出售】"),
+      null
     );
+    assert.strictEqual(splitTitlePrefix("【出售】Desk", undefined), null);
   });
 
-  test("leaves topics without listing data alone", function (assert) {
+  test("colours by kind only", function (assert) {
     assert.strictEqual(
-      titleWithColoredPrefix("【出售】Desk", undefined, undefined),
-      "【出售】Desk"
+      titlePrefixClass("sell"),
+      "kuu-market-title-prefix kuu-market-title-prefix--sell"
+    );
+    assert.strictEqual(
+      titlePrefixClass("buy"),
+      "kuu-market-title-prefix kuu-market-title-prefix--buy"
     );
   });
 });
