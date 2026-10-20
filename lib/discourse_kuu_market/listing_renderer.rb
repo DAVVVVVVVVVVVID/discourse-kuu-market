@@ -33,6 +33,20 @@ module DiscourseKuuMarket
       end
     end
 
+    # 列表卡片上的价格：出售「¥52,000」、赠送「赠送」、求购是预算（和标题里的写法一样）
+    def card_price
+      in_site_locale do
+        case title_key
+        when "buy"
+          budget
+        when "free"
+          t("card.free")
+        else
+          yen(@listing.price)
+        end
+      end
+    end
+
     def raw
       in_site_locale do
         [photos_markdown, fields_markdown, @listing.description.strip].compact_blank.join("\n\n")

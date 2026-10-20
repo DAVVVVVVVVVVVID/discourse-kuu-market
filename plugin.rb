@@ -13,6 +13,7 @@ register_asset "stylesheets/common/kuu-market.scss"
 
 register_svg_icon "clock-rotate-left"
 register_svg_icon "cart-shopping"
+register_svg_icon "magnifying-glass"
 
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"
@@ -74,12 +75,20 @@ after_initialize do
     include_condition: -> { object.kuu_market_listing_in_market.present? },
   ) { object.kuu_market_listing_in_market.status }
 
-  # 列表标题开头的前缀单独上色用
+  # 帖子列表里二手帖显示成商品卡片用（Issue #1）。只给二手帖加，记录已经批量预加载
   add_to_serializer(
     :topic_list_item,
-    :kuu_market_title_prefix,
+    :kuu_market_card,
     include_condition: -> { object.kuu_market_listing_in_market.present? },
-  ) { DiscourseKuuMarket::ListingRenderer.new(object.kuu_market_listing_in_market).title_prefix }
+  ) do
+    listing = object.kuu_market_listing_in_market
+    {
+      item_name: listing.item_name,
+      price: DiscourseKuuMarket::ListingRenderer.new(listing).card_price,
+      free: listing.sell? && listing.free,
+      has_photos: listing.upload_ids.any?,
+    }
+  end
 
   NewPostManager.add_handler(100) { |manager| DiscourseKuuMarket::NewTopicRules.check(manager) }
 

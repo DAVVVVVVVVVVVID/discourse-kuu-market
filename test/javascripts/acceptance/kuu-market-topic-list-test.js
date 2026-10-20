@@ -4,72 +4,112 @@ import { cloneJSON } from "discourse/lib/object";
 import DiscoveryFixtures from "discourse/tests/fixtures/discovery-fixtures";
 import { acceptance } from "discourse/tests/helpers/qunit-helpers";
 
-acceptance("KUU market | topic list classes", function (needs) {
+const PLACEHOLDER = "/images/kuu-placeholder.png";
+const BUY_IMAGE = "/images/kuu-buy.png";
+
+function listing(topic, kind, status, card) {
+  return Object.assign(topic, {
+    kuu_market_kind: kind,
+    kuu_market_status: status,
+    kuu_market_card: { free: false, has_photos: true, ...card },
+  });
+}
+
+acceptance("KUU market | listing cards in topic lists", function (needs) {
   needs.user();
-  needs.settings({ kuu_market_enabled: true });
+  needs.settings({
+    kuu_market_enabled: true,
+    kuu_market_placeholder_image: PLACEHOLDER,
+    kuu_market_buy_image: BUY_IMAGE,
+  });
   needs.pretender((server, helper) => {
     server.get("/latest.json", () => {
       const json = cloneJSON(DiscoveryFixtures["/latest.json"]);
-      const [selling, sold, renamed] = json.topic_list.topics;
-      Object.assign(selling, {
-        fancy_title: "【出售】宜家书桌 · ¥3,000",
-        kuu_market_kind: "sell",
-        kuu_market_status: "selling",
-        kuu_market_title_prefix: "【出售】",
+      const [withPhoto, withoutPhoto, free, buy, sold] = json.topic_list.topics;
+      listing(withPhoto, "sell", "selling", {
+        item_name: "MacBook Air M2",
+        price: "¥52,000",
+      }).image_url = "/images/macbook.jpg";
+      listing(withoutPhoto, "sell", "selling", {
+        item_name: "宜家书桌",
+        price: "¥3,000",
+        has_photos: false,
       });
-      Object.assign(sold, {
-        fancy_title: "【求购】自行车",
-        kuu_market_kind: "buy",
-        kuu_market_status: "closed",
-        kuu_market_title_prefix: "【求购】",
+      listing(free, "sell", "selling", {
+        item_name: "电饭锅",
+        price: "赠送",
+        free: true,
       });
-      Object.assign(renamed, {
-        fancy_title: "Desk renamed by staff",
-        kuu_market_kind: "sell",
-        kuu_market_status: "selling",
-        kuu_market_title_prefix: "【出售】",
-      });
+      listing(buy, "buy", "buying", {
+        item_name: "自行车",
+        price: "¥0–2,000",
+        has_photos: true,
+      }).image_url = "/images/reference.jpg";
+      listing(sold, "sell", "sold", { item_name: "椅子", price: "¥500" });
       return helper.response(json);
     });
   });
 
-  test("marks listings with their kind and status", async function (assert) {
+  function card(index) {
+    return `.topic-list-item:nth-child(${index}) .kuu-market-card`;
+  }
+
+  test("shows a product card for each listing", async function (assert) {
     await visit("/latest");
 
-    assert
-      .dom(".topic-list-item.kuu-market-listing")
-      .exists({ count: 3 }, "only listings are marked");
-    assert
-      .dom(".topic-list-item.kuu-market-kind-sell.kuu-market-status-selling")
-      .exists();
-    assert
-      .dom(".topic-list-item.kuu-market-kind-buy.kuu-market-status-closed")
-      .exists();
-  });
-
-  test("colours the title prefix and keeps core's title link", async function (assert) {
-    await visit("/latest");
-
-    const sellLink = ".topic-list-item.kuu-market-kind-sell a.title";
-    assert
-      .dom(`${sellLink}.raw-topic-link .kuu-market-title-prefix--sell`)
-      .hasText("【出售】");
-    assert
-      .dom(`${sellLink}.raw-topic-link`)
-      .hasText("【出售】宜家书桌 · ¥3,000");
+    assert.dom(".kuu-market-card").exists({ count: 5 }, "only listings");
     assert
       .dom(
-        ".topic-list-item.kuu-market-kind-buy a.title .kuu-market-title-prefix--buy"
+        ".topic-list-item.kuu-market-listing.kuu-market-kind-buy.kuu-market-status-buying"
       )
-      .hasText("【求购】");
-    assert
-      .dom(".kuu-market-title-prefix")
-      .exists({ count: 2 }, "a renamed listing and other topics stay plain");
+      .exists("items keep the kind and status classes for theme components");
 
-    await focus(sellLink);
+    assert.dom(`${card(1)} .kuu-market-card__name`).hasText("MacBook Air M2");
+    assert.dom(`${card(1)} .kuu-market-card__price`).hasText("¥52,000");
     assert
-      .dom(".topic-list-item.kuu-market-kind-sell")
+      .dom(`${card(1)} .kuu-market-card__image img`)
+      .hasAttribute(
+        "src",
+        "/images/macbook.jpg",
+        "sell listings use their photo"
+      );
+    assert
+      .dom(`${card(1)} .kuu-market-card__status.kuu-market-status-selling`)
+      .exists();
+
+    assert
+      .dom(`${card(2)} .kuu-market-card__image img`)
+      .hasAttribute("src", PLACEHOLDER, "no photo: the placeholder");
+
+    assert.dom(`${card(3)} .kuu-market-card__price.--free`).hasText("赠送");
+
+    assert
+      .dom(`${card(4)} .kuu-market-card__image img`)
+      .hasAttribute("src", BUY_IMAGE, "buy listings always use the buy image");
+    assert.dom(`${card(4)} .kuu-market-card__price`).hasText("¥0–2,000");
+
+    assert.dom(card(5)).hasClass("--ended", "ended listings are faded");
+  });
+
+  test("keeps core's title link behaviour", async function (assert) {
+    await visit("/latest");
+
+    assert.dom(card(1)).hasClass("raw-topic-link");
+    assert.dom(card(1)).hasClass("title");
+
+    await focus(card(1));
+    assert
+      .dom(".topic-list-item:nth-child(1)")
       .hasClass("selected", "keyboard focus still highlights the row");
+  });
+
+  test("leaves other topics alone", async function (assert) {
+    await visit("/latest");
+
+    assert
+      .dom(".topic-list-item:nth-child(6) a.title.raw-topic-link")
+      .exists("ordinary topics keep core's title link");
+    assert.dom(".topic-list-item:nth-child(6) .kuu-market-card").doesNotExist();
   });
 
   test("leaves the topic model's title plain", function (assert) {
@@ -77,7 +117,6 @@ acceptance("KUU market | topic list classes", function (needs) {
       id: 999,
       fancy_title: "【出售】宜家书桌",
       kuu_market_kind: "sell",
-      kuu_market_title_prefix: "【出售】",
     });
 
     assert.strictEqual(
@@ -88,26 +127,24 @@ acceptance("KUU market | topic list classes", function (needs) {
   });
 });
 
-acceptance("KUU market | topic list classes when disabled", function (needs) {
+acceptance("KUU market | listing cards when disabled", function (needs) {
   needs.user();
   needs.settings({ kuu_market_enabled: false });
   needs.pretender((server, helper) => {
     server.get("/latest.json", () => {
       const json = cloneJSON(DiscoveryFixtures["/latest.json"]);
-      Object.assign(json.topic_list.topics[0], {
-        fancy_title: "【出售】宜家书桌",
-        kuu_market_kind: "sell",
-        kuu_market_status: "selling",
-        kuu_market_title_prefix: "【出售】",
+      listing(json.topic_list.topics[0], "sell", "selling", {
+        item_name: "宜家书桌",
+        price: "¥3,000",
       });
       return helper.response(json);
     });
   });
 
-  test("adds no classes", async function (assert) {
+  test("shows plain topic list items", async function (assert) {
     await visit("/latest");
 
     assert.dom(".kuu-market-listing").doesNotExist();
-    assert.dom(".kuu-market-title-prefix").doesNotExist();
+    assert.dom(".kuu-market-card").doesNotExist();
   });
 });
