@@ -160,6 +160,7 @@
 
   .kuu-market-card__image {
     // 正方形按列宽算；不对齐顶部的话会被拉到和右边文字一样高，再按高度算出比列更宽的方块
+    position: relative;
     align-self: start;
     width: 100%;
     display: flex;
@@ -174,10 +175,18 @@
     color: var(--primary-low-mid);
     font-size: var(--font-up-4);
 
+    // 图片绝对定位铺满方框，不参与 flex 尺寸计算：iPhone Safari 上 flex 子项的图片会按原图大小摆放，
+    // 方框只露出照片的一角（2026-10-21 David 手机实测）。Chrome 上原来的写法正常
     img {
+      position: absolute;
+      inset: 0;
+      display: block;
       width: 100%;
       height: 100%;
+      max-width: none;
+      min-width: 0;
       object-fit: cover;
+      object-position: center;
     }
   }
 
