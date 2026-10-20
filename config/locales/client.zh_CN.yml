@@ -49,6 +49,13 @@ zh_CN:
           budget_required: "最低、最高预算至少填一个"
           budget_order: "最高预算不能低于最低预算"
           too_many_photos: "最多 %{count} 张"
+      # 列表卡片上的状态比帖子页短一点（2026-10-20 David 定：求购中 → 求购）
+      card_statuses:
+        selling: "在售"
+        sold: "已出"
+        buying: "求购"
+        closed: "已结束"
+        expired: "已过期"
       statuses:
         selling: "在售"
         sold: "已出"

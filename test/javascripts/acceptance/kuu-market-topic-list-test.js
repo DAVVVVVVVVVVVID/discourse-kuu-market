@@ -3,6 +3,7 @@ import { test } from "qunit";
 import { cloneJSON } from "discourse/lib/object";
 import DiscoveryFixtures from "discourse/tests/fixtures/discovery-fixtures";
 import { acceptance } from "discourse/tests/helpers/qunit-helpers";
+import { i18n } from "discourse-i18n";
 
 const PLACEHOLDER = "/images/kuu-placeholder.png";
 const BUY_IMAGE = "/images/kuu-buy.png";
@@ -87,6 +88,9 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
       .dom(`${card(4)} .kuu-market-card__image img`)
       .hasAttribute("src", BUY_IMAGE, "buy listings always use the buy image");
     assert.dom(`${card(4)} .kuu-market-card__price`).hasText("¥0–2,000");
+    assert
+      .dom(`${card(4)} .kuu-market-card__status`)
+      .hasText(i18n("kuu_market.card_statuses.buying"));
 
     assert.dom(card(5)).hasClass("--ended", "ended listings are faded");
   });

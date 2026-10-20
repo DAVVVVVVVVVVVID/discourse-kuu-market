@@ -197,18 +197,23 @@
     overflow-wrap: anywhere;
   }
 
+  // 状态固定在右下角、和价格同一行；价格太长（比如求购的预算）就截断，不把状态挤到下一行
   .kuu-market-card__footer {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--space-2);
     align-items: center;
     justify-content: space-between;
   }
 
   .kuu-market-card__price {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
     color: var(--kuu-market-card-price-color);
     font-size: 1.15em;
     font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     &.--free {
       color: var(--kuu-market-card-free-color);
@@ -235,6 +240,7 @@
 }
 
 .kuu-market-card__status {
+  flex: none;
   padding: 0.2em 0.75em 0.2em 1.55em;
   border-radius: 999px;
   font-size: var(--font-down-1);
@@ -250,5 +256,23 @@
 
   &.kuu-market-status-buying {
     @include kuu-market-card-pill(#e4eefa, #1f5fa8, #3478c6);
+  }
+}
+
+// 手机上卡片窄：先把图片列、价格和状态缩小一点，常见的「¥10,000 以内」能完整放下；
+// 只有特别长的预算才会被截断
+html.mobile-view
+  .topic-list
+  .topic-list-item
+  .main-link
+  a.title.raw-topic-link.kuu-market-card {
+  grid-template-columns: 5.5rem 1fr;
+
+  .kuu-market-card__price {
+    font-size: 0.9em;
+  }
+
+  .kuu-market-card__status {
+    font-size: var(--font-down-2);
   }
 }

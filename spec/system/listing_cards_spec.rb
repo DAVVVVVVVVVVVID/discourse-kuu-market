@@ -67,7 +67,7 @@ RSpec.describe "Listings shown as product cards in topic lists" do
     expect(card(free)).to have_css(".kuu-market-card__price.--free", exact_text: "赠送")
 
     expect(card(buy)).to have_css(".kuu-market-card__price", exact_text: "¥0–2,000")
-    expect(card(buy)).to have_css(".kuu-market-card__status", exact_text: "求购中")
+    expect(card(buy)).to have_css(".kuu-market-card__status", exact_text: "求购")
     expect(card(buy).find(".kuu-market-card__image img")[:src]).to include(buy_image.url)
 
     price = card(sell).find(".kuu-market-card__price")
@@ -103,6 +103,50 @@ RSpec.describe "Listings shown as product cards in topic lists" do
     item = find(".topic-list-item[data-topic-id='#{regular_topic.id}']")
     expect(item).to have_css("a.title.raw-topic-link", text: "A regular topic about bikes")
     expect(item).to have_no_css(".kuu-market-card")
+  end
+
+  it "keeps the status on the price row on phones, even with a long budget", mobile: true do
+    buy =
+      post_listing(
+        kind: "buy",
+        item_name: "Bicycle",
+        budget_min: 100_000,
+        budget_max: 1_000_000,
+        trade_method: nil,
+        upload_ids: [],
+      )
+    sign_in(viewer)
+
+    visit("/latest")
+
+    price = card(buy).find(".kuu-market-card__price")
+    status = card(buy).find(".kuu-market-card__status")
+    price_box = price.evaluate_script("this.getBoundingClientRect().toJSON()")
+    status_box = status.evaluate_script("this.getBoundingClientRect().toJSON()")
+    expect(status_box["top"]).to be < price_box["bottom"]
+    expect(status_box["right"]).to be_within(2).of(
+      card(buy).find(".kuu-market-card__footer").evaluate_script(
+        "this.getBoundingClientRect().right",
+      ),
+    )
+  end
+
+  it "says 求购 on the card and 求购中 on the topic page" do
+    buy =
+      post_listing(
+        kind: "buy",
+        item_name: "Bicycle",
+        budget_max: 2000,
+        trade_method: nil,
+        upload_ids: [],
+      )
+    sign_in(viewer)
+
+    visit("/latest")
+    expect(card(buy)).to have_css(".kuu-market-card__status", exact_text: "求购")
+
+    topic_page.visit_topic(buy)
+    expect(page).to have_css(".kuu-market-panel__status", exact_text: "求购中")
   end
 
   it "keeps the topic page as it was" do

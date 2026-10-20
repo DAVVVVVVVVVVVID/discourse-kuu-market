@@ -39,7 +39,7 @@ export default class ListingTopicLink extends Component {
   }
 
   get statusLabel() {
-    return i18n(`kuu_market.statuses.${this.topic.kuu_market_status}`);
+    return i18n(`kuu_market.card_statuses.${this.topic.kuu_market_status}`);
   }
 
   get url() {
