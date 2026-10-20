@@ -5,7 +5,7 @@
 //     node /tmp/screenshot.mjs /c/market/7 /tmp/shot 用户名 密码 "click:#create-topic" "wait:.kuu-market-form"
 //   docker cp discourse_dev:/tmp/shot-desktop.png . （手机版是 shot-mobile.png）
 // 步骤：click:选择器、wait:选择器、fill:选择器::内容、upload:选择器::文件路径。用户名为 - 时不登录。
-// 只用于本地开发库里的测试账号。
+// 加 -e FULL_PAGE=1 截整页。只用于本地开发库里的测试账号。
 import { chromium, devices } from "/src/node_modules/playwright/index.mjs";
 
 const [path = "/", prefix = "/tmp/shot", username, password, ...steps] =
@@ -68,7 +68,7 @@ async function capture(context, file) {
     await page.waitForTimeout(800);
   } finally {
     // 某一步失败时也截下当时的画面，方便排查
-    await page.screenshot({ path: file });
+    await page.screenshot({ path: file, fullPage: !!process.env.FULL_PAGE });
   }
 }
 

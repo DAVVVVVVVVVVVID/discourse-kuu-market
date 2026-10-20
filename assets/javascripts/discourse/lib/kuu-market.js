@@ -1,5 +1,3 @@
-import { escapeExpression } from "discourse/lib/utilities";
-
 // 和后端 DiscourseKuuMarket::Listing 的限制保持一致
 export const ITEM_NAME_MAX_LENGTH = 40;
 export const LOCATION_MAX_LENGTH = 40;
@@ -75,19 +73,4 @@ export function payloadFrom(data) {
 // 标题开头【出售】【赠送】【求购】的上色元素用的类名。只跟类型走，不随状态变（2026-10-19 David 定）
 export function titlePrefixClass(kind) {
   return `kuu-market-title-prefix kuu-market-title-prefix--${kind === "buy" ? "buy" : "sell"}`;
-}
-
-// fancyHtml 是 core 转义过的标题 HTML。标题确实以插件生成的前缀开头时，返回拆开的前缀（纯文字）
-// 和其余部分（HTML）；不是的话（比如管理员手动改过标题）返回 null，照 core 原样显示
-export function splitTitlePrefix(fancyHtml, prefix) {
-  if (!fancyHtml || !prefix) {
-    return null;
-  }
-
-  const escapedPrefix = escapeExpression(prefix);
-  if (!fancyHtml.startsWith(escapedPrefix)) {
-    return null;
-  }
-
-  return { prefix, rest: fancyHtml.slice(escapedPrefix.length) };
 }

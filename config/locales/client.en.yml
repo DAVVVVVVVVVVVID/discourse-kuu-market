@@ -49,6 +49,12 @@ en:
           budget_required: "Fill in at least one end of the budget"
           budget_order: "The maximum cannot be lower than the minimum"
           too_many_photos: "Up to %{count}"
+      card_statuses:
+        selling: "For sale"
+        sold: "Sold"
+        buying: "Wanted"
+        closed: "Closed"
+        expired: "Expired"
       statuses:
         selling: "For sale"
         sold: "Sold"

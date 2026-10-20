@@ -23,3 +23,11 @@ discourse_kuu_market:
   kuu_market_default_location:
     default: "吉田本校区"
     client: true
+  kuu_market_placeholder_image:
+    type: upload
+    default: ""
+    client: true
+  kuu_market_buy_image:
+    type: upload
+    default: ""
+    client: true

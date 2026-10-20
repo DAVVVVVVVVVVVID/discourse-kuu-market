@@ -97,6 +97,29 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
     end
   end
 
+  describe "#card_price" do
+    it "shows the price, a giveaway or the budget" do
+      expect(
+        described_class.new(Fabricate.build(:kuu_market_listing, price: 52_000)).card_price,
+      ).to eq("¥52,000")
+      expect(
+        described_class.new(
+          Fabricate.build(:kuu_market_listing, price: nil, free: true),
+        ).card_price,
+      ).to eq("赠送")
+      expect(
+        described_class.new(
+          Fabricate.build(:kuu_market_buy_listing, budget_min: 0, budget_max: 2000),
+        ).card_price,
+      ).to eq("¥0–2,000")
+      expect(
+        described_class.new(
+          Fabricate.build(:kuu_market_buy_listing, budget_min: nil, budget_max: 10_000),
+        ).card_price,
+      ).to eq("¥10,000 以内")
+    end
+  end
+
   describe "#raw" do
     context "when selling" do
       let(:listing) do

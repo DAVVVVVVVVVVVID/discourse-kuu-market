@@ -122,3 +122,157 @@
     gap: var(--space-2);
   }
 }
+
+// 帖子列表里的二手帖商品卡片（Issue #1）：左图，右边商品名、价格，右下角状态。
+// 颜色可以在主题组件里覆盖
+:root {
+  --kuu-market-card-price-color: #e5484d;
+  --kuu-market-card-free-color: #1e7b3c;
+}
+
+// 卡片取代了 FKB Pro 卡片的上中下三块（分类和作者、摘要和缩略图、浏览和回复数）；没装 FKB Pro 时这几条不起作用。
+// 主题的样式表在插件之后加载，选择器要比 FKB Pro 的（.topic-list .main-link .tli-top-section）更具体才盖得住
+.topic-list .topic-list-item.kuu-market-listing .main-link {
+  .tli-top-section,
+  .tli-middle-section,
+  .tli-bottom-section {
+    display: none;
+  }
+}
+
+// core 和 FKB Pro 都给标题链接写了字重、颜色、下边距（已读的标题还不一样），卡片里的样式都放在这个选择器下面
+.topic-list .topic-list-item .main-link a.title.raw-topic-link.kuu-market-card {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--space-3);
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--primary);
+  font-weight: normal;
+
+  &.--ended {
+    opacity: 0.6;
+  }
+
+  .kuu-market-card__image {
+    // 正方形按列宽算；不对齐顶部的话会被拉到和右边文字一样高，再按高度算出比列更宽的方块
+    align-self: start;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--d-default-border-radius);
+    background: var(--primary-very-low);
+    color: var(--primary-low-mid);
+    font-size: var(--font-up-4);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .kuu-market-card__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+    gap: var(--space-2);
+  }
+
+  .kuu-market-card__name {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: var(--line-height-medium);
+    overflow-wrap: anywhere;
+  }
+
+  // 状态固定在右下角、和价格同一行；价格太长（比如求购的预算）就截断，不把状态挤到下一行
+  .kuu-market-card__footer {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kuu-market-card__price {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--kuu-market-card-price-color);
+    font-size: 1.15em;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &.--free {
+      color: var(--kuu-market-card-free-color);
+    }
+  }
+}
+
+// core 的未读数徽章跟在标题链接后面，卡片是整块的，它会单独占一行；改成浮在卡片右上角
+.topic-list .topic-list-item.kuu-market-listing .main-link {
+  position: relative;
+
+  .topic-post-badges {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+  }
+}
+
+// 胶囊标签：沿用 KUU 主题组件原来的样式和颜色（在售绿、求购蓝、已出 / 已结束 / 已过期灰）
+@mixin kuu-market-card-pill($bg, $fg, $dot) {
+  color: $fg;
+  background:
+    radial-gradient(circle at 0.95em 50%, $dot 0 0.26em, transparent 0.3em), $bg;
+}
+
+.kuu-market-card__status {
+  flex: none;
+  padding: 0.2em 0.75em 0.2em 1.55em;
+  border-radius: 999px;
+  font-size: var(--font-down-1);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  @include kuu-market-card-pill(#eef0f2, #6b7280, #a0a6af);
+
+  &.kuu-market-status-selling {
+    @include kuu-market-card-pill(#e6f4ea, #1e7b3c, #2e9a52);
+  }
+
+  &.kuu-market-status-buying {
+    @include kuu-market-card-pill(#e4eefa, #1f5fa8, #3478c6);
+  }
+}
+
+// 手机上卡片窄：先把图片列、价格和状态缩小一点，常见的「¥10,000 以内」能完整放下；
+// 只有特别长的预算才会被截断
+html.mobile-view
+  .topic-list
+  .topic-list-item
+  .main-link
+  a.title.raw-topic-link.kuu-market-card {
+  grid-template-columns: 5.5rem 1fr;
+
+  .kuu-market-card__price {
+    font-size: 0.9em;
+  }
+
+  .kuu-market-card__status {
+    font-size: var(--font-down-2);
+  }
+}
