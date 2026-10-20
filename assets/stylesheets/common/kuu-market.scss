@@ -37,8 +37,7 @@
     position: relative;
     aspect-ratio: 1;
     overflow: hidden;
-    // 不用 --d-default-border-radius：FKB Pro 里它是 1em，卡片字号大，算出来 24px，手机上 88px 的图几乎成了圆
-    border-radius: 8px;
+    border-radius: var(--d-default-border-radius);
     background: var(--primary-very-low);
   }
 
@@ -145,6 +144,7 @@
 .topic-list .topic-list-item .main-link a.title.raw-topic-link.kuu-market-card {
   display: grid;
   grid-template-columns: 6.5rem 1fr;
+
   // 图片和文字的间距 = 图片到卡片左边的距离（FKB Pro 的 .main-link 左内边距约 18.4px，2026-10-21 线上实测）
   gap: 1.15rem;
   align-items: stretch;
@@ -167,7 +167,9 @@
     justify-content: center;
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: var(--d-default-border-radius);
+
+    // 不用 --d-default-border-radius：FKB Pro 里它是 1em，卡片字号大，算出来 24px，手机上 88px 的图几乎成了圆
+    border-radius: 8px;
     background: var(--primary-very-low);
     color: var(--primary-low-mid);
     font-size: var(--font-up-4);
