@@ -20,6 +20,10 @@ discourse_kuu_market:
     min: 1
     max: 20
     client: true
+  kuu_market_hand_actions_per_day:
+    default: 3
+    min: 1
+    max: 100
   kuu_market_default_location:
     default: "吉田本校区"
     client: true

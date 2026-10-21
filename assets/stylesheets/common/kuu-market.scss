@@ -123,6 +123,70 @@
   }
 }
 
+// 举手按钮和排队头像（Issue #5），在二手信息面板里单独占一行
+.kuu-market-hands {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+
+  &__raise.btn-primary {
+    background: var(--kuu-market-navy);
+    color: var(--secondary);
+
+    .d-icon {
+      color: var(--secondary);
+    }
+  }
+
+  &__raised {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    color: var(--kuu-market-navy);
+    font-weight: bold;
+  }
+
+  &__queue {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    align-items: center;
+  }
+
+  &__avatars {
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  &__avatar {
+    display: flex;
+  }
+
+  &__count {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__list {
+    margin: 0;
+    padding: var(--space-2);
+    list-style: none;
+    max-height: 20rem;
+    overflow-y: auto;
+
+    a {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+      padding: var(--space-1) 0;
+      color: var(--primary);
+    }
+  }
+}
+
 // 帖子列表里的二手帖商品卡片（Issue #1）：左图，右边商品名、价格，右下角状态。
 // 颜色可以在主题组件里覆盖
 :root {

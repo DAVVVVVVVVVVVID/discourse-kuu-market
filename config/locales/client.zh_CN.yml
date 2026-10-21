@@ -76,6 +76,37 @@ zh_CN:
         ended: "状态已更新。"
         relisted_and_bumped: "已重新上架，并顶回了「最新」最上面。"
         relisted_without_bump: "已重新上架。这次没有顶帖（每 %{days} 天最多顶一次），%{date} 之后再重新上架就会顶帖。"
+      # 举手的文案是 David 在 Issue #5 里定的（2026-10-21）
+      hands:
+        raise:
+          sell: "举手购买"
+          buy: "举手售出"
+        raised: "已举手"
+        cancel: "取消举手"
+        confirm_cancel:
+          sell: "取消后会私信告诉卖家同学。确定取消举手吗？"
+          buy: "取消后会私信告诉该同学。确定取消举手吗？"
+        count:
+          sell: "%{count} 位同学想购买"
+          buy: "%{count} 位同学可以提供"
+        more: "还有 %{count} 位"
+        sent:
+          raised:
+            sell: "已经发送信息告诉该卖家同学，请关注私信内容哦~"
+            buy: "已经发送信息告诉该同学，请关注私信内容哦~"
+          cancelled:
+            sell: "已经私信该卖家同学取消购买请求"
+            buy: "已经私信该同学取消请求"
+        poster_unavailable:
+          raised:
+            sell: "已举手。卖家关闭了私聊，可以在帖子下面回复"
+            buy: "已举手。该同学关闭了私聊，可以在帖子下面回复"
+          cancelled:
+            sell: "已取消举手。卖家关闭了私聊，没能私信通知"
+            buy: "已取消举手。该同学关闭了私聊，没能私信通知"
+        failed:
+          raised: "已举手，但私信没能发出去，可以在帖子下面回复"
+          cancelled: "已取消举手，但私信没能发出去"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"

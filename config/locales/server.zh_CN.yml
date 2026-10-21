@@ -5,6 +5,7 @@ zh_CN:
     kuu_market_expire_days: "出售 / 求购帖进入在售或求购状态满多少天后自动过期。"
     kuu_market_bump_interval_days: "重新上架时把帖子顶回「最新」的最短间隔（天）。间隔内重新上架照样能改状态，只是不顶帖。"
     kuu_market_max_photos: "出售帖最多能放几张照片。"
+    kuu_market_hand_actions_per_day: "同一个帖子每人每天最多举手 / 取消几次（合计）。每次都会给作者发私聊，用来防刷。"
     kuu_market_default_location: "发帖表单里「交易地点」预先填好的内容，用户可以改。"
     kuu_market_placeholder_image: "帖子列表里，没有照片的出售帖卡片用的图（建议正方形，至少 400×400）。"
     kuu_market_buy_image: "帖子列表里，求购帖卡片一律用的图（建议正方形，至少 400×400）。"
@@ -15,6 +16,8 @@ zh_CN:
       cannot_manage: "只有作者本人和管理员可以修改这个帖子。"
       status_unreachable: "这个帖子不能切换到这个状态。"
       edit_with_market_form: "二手帖的标题和第一楼由表单生成，请用帖子上的「修改」按钮修改。"
+      hand_already_raised: "你已经举过手了。"
+      too_many_hand_actions: "反复举手发私信会造成困扰哦！请明天再试吧!"
     listing:
       title:
         sell: "【出售】%{item} · %{price}"
@@ -28,6 +31,13 @@ zh_CN:
       free: "免费赠送"
       card:
         free: "赠送"
+      hand_messages:
+        raised:
+          sell: "同学您好！我想购买这件物品，可以咨询一下吗？"
+          buy: "同学您好！我这里有你想要的物品，可以咨询一下吗？"
+        cancelled:
+          sell: "我暂时不需要了，取消购买请求"
+          buy: "我这边暂时出不了了，取消"
       field_line: "- **%{label}**：%{value}"
       fields:
         price: "价格"

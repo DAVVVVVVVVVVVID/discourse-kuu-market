@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { fn } from "@ember/helper";
-import { action } from "@ember/object";
+import { action, get, set } from "@ember/object";
 import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
@@ -10,8 +10,9 @@ import { eq } from "discourse/truth-helpers";
 import DButton from "discourse/ui-kit/d-button";
 import { i18n } from "discourse-i18n";
 import ListingForm from "./modal/listing-form";
+import RaisedHands from "./raised-hands";
 
-// 帖子页标题下方：所有人看到状态；作者和管理员看到过期时间、切换状态和「修改」按钮
+// 帖子页标题下方：所有人看到状态和举手排队；作者和管理员看到过期时间、切换状态和「修改」按钮
 export default class ListingPanel extends Component {
   @service dialog;
   @service modal;
@@ -21,12 +22,18 @@ export default class ListingPanel extends Component {
 
   @tracked changingTo = null;
 
+  // 用 get 读：举手后 set 进来的新值，以及帖子重新加载时的新值，才会重新渲染
   get listing() {
-    return this.args.outletArgs.model.kuu_market_listing;
+    return get(this.args.outletArgs.model, "kuu_market_listing");
   }
 
   get statusLabel() {
     return i18n(`kuu_market.statuses.${this.listing.status}`);
+  }
+
+  // 只有进行中的帖子带 raised_hands；排队为空时也要显示按钮
+  get showHands() {
+    return Array.isArray(this.listing.raised_hands);
   }
 
   get isChanging() {
@@ -52,6 +59,12 @@ export default class ListingPanel extends Component {
     } else {
       this.#saveStatus(status);
     }
+  }
+
+  // 举手后不重新加载整个帖子，只换掉二手信息
+  @action
+  updateListing(listing) {
+    set(this.args.outletArgs.model, "kuu_market_listing", listing);
   }
 
   @action
@@ -130,6 +143,13 @@ export default class ListingPanel extends Component {
               @label="kuu_market.panel.edit"
             />
           </div>
+        {{/if}}
+
+        {{#if this.showHands}}
+          <RaisedHands
+            @listing={{this.listing}}
+            @onChange={{this.updateListing}}
+          />
         {{/if}}
       </div>
     {{/if}}

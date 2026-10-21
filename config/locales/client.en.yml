@@ -75,6 +75,40 @@ en:
         ended: "Status updated."
         relisted_and_bumped: "Relisted and bumped to the top of Latest."
         relisted_without_bump: "Relisted. It was not bumped this time (at most once every %{days} days); relisting after %{date} will bump it."
+      hands:
+        raise:
+          sell: "I want to buy"
+          buy: "I can offer"
+        raised: "Hand raised"
+        cancel: "Lower hand"
+        confirm_cancel:
+          sell: "The seller will get a chat message saying you withdrew. Lower your hand?"
+          buy: "They will get a chat message saying you withdrew. Lower your hand?"
+        count:
+          sell:
+            one: "%{count} person wants to buy"
+            other: "%{count} people want to buy"
+          buy:
+            one: "%{count} person can offer"
+            other: "%{count} people can offer"
+        more: "%{count} more"
+        sent:
+          raised:
+            sell: "We sent the seller a chat message. Keep an eye on your messages!"
+            buy: "We sent them a chat message. Keep an eye on your messages!"
+          cancelled:
+            sell: "We let the seller know you withdrew."
+            buy: "We let them know you withdrew."
+        poster_unavailable:
+          raised:
+            sell: "Hand raised. The seller has turned off direct messages; you can reply to the topic instead."
+            buy: "Hand raised. They have turned off direct messages; you can reply to the topic instead."
+          cancelled:
+            sell: "Hand lowered. The seller has turned off direct messages, so they were not notified."
+            buy: "Hand lowered. They have turned off direct messages, so they were not notified."
+        failed:
+          raised: "Hand raised, but the chat message could not be sent. You can reply to the topic instead."
+          cancelled: "Hand lowered, but the chat message could not be sent."
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"
