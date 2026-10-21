@@ -23,6 +23,11 @@ module ::DiscourseKuuMarket
     market_category_id = SiteSetting.kuu_market_category.to_i
     market_category_id > 0 && category_id.to_i == market_category_id
   end
+
+  # 两个人之间的聊天私聊频道（没有就是 nil），前端「去私信」直接打开它
+  def self.direct_message_channel_id(user, other_user)
+    Chat::DirectMessage.for_user_ids([user.id, other_user.id])&.direct_message_channel&.id
+  end
 end
 
 require_relative "lib/discourse_kuu_market/engine"

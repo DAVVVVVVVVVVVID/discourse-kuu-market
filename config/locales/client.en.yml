@@ -90,6 +90,8 @@ en:
           buy: "I can offer"
         raised: "Hand raised"
         cancel: "Lower hand"
+        open_chat: "Open messages"
+        keep_browsing: "Keep browsing"
         confirm_cancel:
           sell: "The seller will get a chat message saying you withdrew. Lower your hand?"
           buy: "They will get a chat message saying you withdrew. Lower your hand?"
@@ -119,7 +121,6 @@ en:
           raised: "Hand raised, but the chat message could not be sent. You can reply to the topic instead."
           cancelled: "Hand lowered, but the chat message could not be sent."
       hand_alert:
-        title: "People raised their hand"
         line:
           sell:
             one: "%{count} person wants to buy your “%{item}”"
@@ -128,8 +129,6 @@ en:
             one: "%{count} person can offer the “%{item}” you're looking for"
             other: "%{count} people can offer the “%{item}” you're looking for"
         hint: "Check your direct messages!"
-        open_chat: "Open messages"
-        close: "Got it"
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"

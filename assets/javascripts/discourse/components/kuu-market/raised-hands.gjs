@@ -11,6 +11,7 @@ import DButton from "discourse/ui-kit/d-button";
 import dAvatar from "discourse/ui-kit/helpers/d-avatar";
 import dIcon from "discourse/ui-kit/helpers/d-icon";
 import { i18n } from "discourse-i18n";
+import { openDirectMessages } from "../../lib/kuu-market";
 
 const VISIBLE_AVATARS = 8;
 
@@ -19,6 +20,7 @@ const VISIBLE_AVATARS = 8;
 export default class RaisedHands extends Component {
   @service currentUser;
   @service dialog;
+  @service router;
   @service toasts;
 
   @tracked saving = false;
@@ -75,12 +77,16 @@ export default class RaisedHands extends Component {
     this.saving = true;
 
     try {
-      const { delivery, listing } = await ajax(
+      const result = await ajax(
         `/kuu-market/listings/${this.listing.topic_id}/hand.json`,
         { type }
       );
-      this.#announce(event, delivery);
-      this.args.onChange(listing);
+      this.args.onChange(result.listing);
+      if (event === "raised") {
+        this.#announceRaised(result);
+      } else {
+        this.#announceCancelled(result.delivery);
+      }
     } catch (error) {
       popupAjaxError(error);
     } finally {
@@ -88,19 +94,45 @@ export default class RaisedHands extends Component {
     }
   }
 
-  #announce(event, delivery) {
+  // 举手后用居中的简单弹窗（Issue #9）：发出去了可以直接去和发帖人的对话；
+  // 没发出去打不开私聊，只有「继续浏览」
+  #announceRaised({ delivery, chat_channel_id }) {
+    if (delivery === "sent") {
+      this.dialog.confirm({
+        class: "kuu-market-hand-dialog",
+        message: i18n(`kuu_market.hands.sent.raised.${this.kind}`),
+        confirmButtonLabel: "kuu_market.hands.open_chat",
+        cancelButtonLabel: "kuu_market.hands.keep_browsing",
+        didConfirm: () => openDirectMessages(this.router, chat_channel_id),
+      });
+    } else {
+      this.dialog.alert({
+        class: "kuu-market-hand-dialog",
+        message: this.#undeliveredMessage("raised", delivery),
+        confirmButtonLabel: "kuu_market.hands.keep_browsing",
+      });
+    }
+  }
+
+  // 取消举手照旧用角落的小提示
+  #announceCancelled(delivery) {
     if (delivery === "sent") {
       this.toasts.success({
         duration: "long",
-        data: { message: i18n(`kuu_market.hands.sent.${event}.${this.kind}`) },
+        data: { message: i18n(`kuu_market.hands.sent.cancelled.${this.kind}`) },
       });
     } else {
-      const message =
-        delivery === "poster_unavailable"
-          ? i18n(`kuu_market.hands.poster_unavailable.${event}.${this.kind}`)
-          : i18n(`kuu_market.hands.failed.${event}`);
-      this.toasts.warning({ duration: "long", data: { message } });
+      this.toasts.warning({
+        duration: "long",
+        data: { message: this.#undeliveredMessage("cancelled", delivery) },
+      });
     }
+  }
+
+  #undeliveredMessage(event, delivery) {
+    return delivery === "poster_unavailable"
+      ? i18n(`kuu_market.hands.poster_unavailable.${event}.${this.kind}`)
+      : i18n(`kuu_market.hands.failed.${event}`);
   }
 
   <template>

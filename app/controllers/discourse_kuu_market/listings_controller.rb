@@ -97,7 +97,9 @@ module DiscourseKuuMarket
 
     def raise_hand
       Listing::RaiseHand.call(service_params) do
-        on_success { |delivery:, listing:| render_hand_result(delivery, listing) }
+        on_success do |delivery:, listing:, chat_channel_id: nil|
+          render_hand_result(delivery, listing, chat_channel_id:)
+        end
         on_failed_contract do |contract|
           render(
             json: failed_json.merge(errors: contract.errors.full_messages),
@@ -134,9 +136,10 @@ module DiscourseKuuMarket
 
     private
 
-    def render_hand_result(delivery, listing)
+    def render_hand_result(delivery, listing, chat_channel_id: nil)
       render json: {
                delivery:,
+               chat_channel_id:,
                listing: TopicListingSerializer.new(listing, scope: guardian, root: false).as_json,
              }
     end

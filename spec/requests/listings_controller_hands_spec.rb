@@ -43,6 +43,9 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
 
         expect(response.status).to eq(200)
         expect(response.parsed_body["delivery"]).to eq("sent")
+        expect(response.parsed_body["chat_channel_id"]).to eq(
+          Chat::DirectMessage.for_user_ids([author.id, buyer.id]).direct_message_channel.id,
+        )
         expect(response.parsed_body["listing"]).to include(
           "hand_raised" => true,
           "raised_hands" => [include("username" => buyer.username)],
@@ -55,6 +58,7 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
         raise_hand
 
         expect(response.parsed_body["delivery"]).to eq("poster_unavailable")
+        expect(response.parsed_body["chat_channel_id"]).to be_nil
       end
 
       it "refuses a second raise" do

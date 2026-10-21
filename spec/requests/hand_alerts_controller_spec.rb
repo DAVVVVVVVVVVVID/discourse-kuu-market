@@ -28,6 +28,7 @@ RSpec.describe DiscourseKuuMarket::HandAlertsController do
         { "topic_id" => listing.topic_id, "kind" => "sell", "item_name" => "宜家书桌", "count" => 1 },
       ],
       "up_to_id" => hand.id,
+      "chat_channel_id" => nil,
     )
   end
 

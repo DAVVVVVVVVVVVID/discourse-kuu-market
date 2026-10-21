@@ -18,6 +18,7 @@ module DiscourseKuuMarket
     policy :within_daily_limit, class_name: Listing::Policy::WithinDailyHandLimit
     step :raise_hand
     step :message_poster
+    only_if(:message_sent) { step :find_chat_channel }
     step :publish_changes
 
     private
@@ -43,6 +44,18 @@ module DiscourseKuuMarket
         listing:,
         sender: guardian.user,
         event: :raised,
+      )
+    end
+
+    def message_sent(delivery:)
+      delivery == :sent
+    end
+
+    # 举手成功后的弹窗里，「去私信」直接打开和发帖人的对话（Issue #9）
+    def find_chat_channel(guardian:, listing:)
+      context[:chat_channel_id] = DiscourseKuuMarket.direct_message_channel_id(
+        guardian.user,
+        listing.topic.user,
       )
     end
 

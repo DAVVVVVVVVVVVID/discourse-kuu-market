@@ -93,6 +93,9 @@ zh_CN:
           buy: "举手售出"
         raised: "已举手"
         cancel: "取消举手"
+        # 举手后、发帖人收到举手提醒时弹窗里的两个按钮（Issue #9，2026-10-22 David 定）
+        open_chat: "去私信"
+        keep_browsing: "继续浏览"
         confirm_cancel:
           sell: "取消后会私信告诉卖家同学。确定取消举手吗？"
           buy: "取消后会私信告诉该同学。确定取消举手吗？"
@@ -119,13 +122,10 @@ zh_CN:
           cancelled: "已取消举手，但私信没能发出去"
       # 发帖人的举手提醒弹窗（Issue #5 第二期，文案是 David 在 Issue 里定的）
       hand_alert:
-        title: "有同学举手啦"
         line:
           sell: "有 %{count} 位同学想要购买你出售的『%{item}』"
           buy: "有 %{count} 位同学想要提供你求购的『%{item}』"
         hint: "快去私信查收吧~"
-        open_chat: "去看私信"
-        close: "知道了"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"

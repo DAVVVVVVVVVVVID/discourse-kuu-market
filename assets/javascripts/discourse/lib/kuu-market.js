@@ -1,3 +1,6 @@
+import { escapeExpression } from "discourse/lib/utilities";
+import { i18n } from "discourse-i18n";
+
 // 和后端 DiscourseKuuMarket::Listing 的限制保持一致
 export const ITEM_NAME_MAX_LENGTH = 40;
 export const LOCATION_MAX_LENGTH = 40;
@@ -6,6 +9,28 @@ export const MAX_YEN = 100_000_000;
 export const BUY_MAX_PHOTOS = 1;
 
 export const TRADE_METHODS = ["pickup", "delivery", "negotiable"];
+
+// 发帖人的举手提醒：每个帖子一行，最后一句「快去私信查收吧~」。dialog 把 message 当 HTML 输出，
+// 商品名是用户填的，要先转义
+export function handAlertMessage({ listings }) {
+  const lines = listings.map(({ kind, item_name, count }) =>
+    i18n(`kuu_market.hand_alert.line.${kind}`, {
+      count,
+      item: escapeExpression(item_name),
+    })
+  );
+  return [...lines, i18n("kuu_market.hand_alert.hint")].join("<br>");
+}
+
+// 「去私信」：知道是哪个对话就直接打开，不知道（几个人举手）就打开私聊列表。
+// 电脑上 chat 默认在右下角的抽屉里打开，手机上全屏，都按 chat 自己的习惯
+export function openDirectMessages(router, chatChannelId) {
+  if (chatChannelId) {
+    router.transitionTo("chat.channel", "-", chatChannelId);
+  } else {
+    router.transitionTo("chat.direct-messages");
+  }
+}
 
 export function marketCategoryId(siteSettings) {
   return parseInt(siteSettings.kuu_market_category, 10) || null;

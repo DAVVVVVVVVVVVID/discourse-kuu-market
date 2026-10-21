@@ -37,7 +37,24 @@ RSpec.describe DiscourseKuuMarket::RaisedHand do
           { topic_id: desk.topic_id, kind: "sell", item_name: "宜家书桌", count: 2 },
         ],
         up_to_id: last.id,
+        chat_channel_id: nil,
       )
+    end
+
+    it "points to the direct message when only one person raised their hand" do
+      desk.raised_hands.create!(user: first_user)
+      bike.raised_hands.create!(user: first_user)
+      channel = Fabricate(:direct_message_channel, users: [seller, first_user])
+
+      expect(alerts[:chat_channel_id]).to eq(channel.id)
+    end
+
+    it "leaves the direct message out when several people raised their hand" do
+      desk.raised_hands.create!(user: first_user)
+      desk.raised_hands.create!(user: second_user)
+      Fabricate(:direct_message_channel, users: [seller, first_user])
+
+      expect(alerts[:chat_channel_id]).to be_nil
     end
 
     it "only counts hands the seller has not been alerted about" do
