@@ -117,6 +117,15 @@ zh_CN:
         failed:
           raised: "已举手，但私信没能发出去，可以在帖子下面回复"
           cancelled: "已取消举手，但私信没能发出去"
+      # 发帖人的举手提醒弹窗（Issue #5 第二期，文案是 David 在 Issue 里定的）
+      hand_alert:
+        title: "有同学举手啦"
+        line:
+          sell: "有 %{count} 位同学想要购买你出售的『%{item}』"
+          buy: "有 %{count} 位同学想要提供你求购的『%{item}』"
+        hint: "快去私信查收吧~"
+        open_chat: "去看私信"
+        close: "知道了"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"

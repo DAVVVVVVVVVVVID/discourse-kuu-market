@@ -80,6 +80,11 @@ after_initialize do
     ).as_json
   end
 
+  # 有新的人举手时，发帖人下次打开论坛弹窗提醒（Issue #5 第二期）。没有时是 nil
+  add_to_serializer(:current_user, :kuu_market_hand_alerts) do
+    DiscourseKuuMarket::RaisedHand.alerts_for(object)
+  end
+
   # 列表卡片的书签样式由 KUU 自定义组件按这两个值加的类名来写
   add_to_serializer(
     :topic_list_item,

@@ -12,6 +12,50 @@ module DiscourseKuuMarket
     scope :active, -> { where(cancelled_at: nil, ended_at: nil) }
     scope :queue, -> { active.joins(:user).order(:created_at, :id) }
 
+    # 发帖人还没在弹窗里看过的举手（Issue #5 第二期）：只算进行中的、还在二手市场的帖子
+    def self.unalerted_for(user)
+      active
+        .where(alerted_at: nil)
+        .joins(listing: :topic)
+        .where(
+          topics: {
+            user_id: user.id,
+            deleted_at: nil,
+            category_id: SiteSetting.kuu_market_category.to_i,
+          },
+        )
+        .where(kuu_market_listings: { status: Listing::ACTIVE_STATUS.values })
+    end
+
+    # 弹窗内容：每个帖子一项（话题 id、类型、商品名、新举手人数），up_to_id 是这批里最大的记录 id，
+    # 关掉弹窗时只标记到这里，弹窗打开以后才举手的人下次再弹
+    def self.alerts_for(user)
+      rows =
+        unalerted_for(user)
+          .group(
+            "kuu_market_listings.topic_id",
+            "kuu_market_listings.kind",
+            "kuu_market_listings.item_name",
+          )
+          .order("MIN(kuu_market_raised_hands.id)")
+          .pluck(
+            "kuu_market_listings.topic_id",
+            "kuu_market_listings.kind",
+            "kuu_market_listings.item_name",
+            Arel.sql("COUNT(*)"),
+            Arel.sql("MAX(kuu_market_raised_hands.id)"),
+          )
+      return if rows.empty?
+
+      {
+        listings:
+          rows.map do |topic_id, kind, item_name, count, _|
+            { topic_id:, kind:, item_name:, count: }
+          end,
+        up_to_id: rows.map(&:last).max,
+      }
+    end
+
     # 防刷用：since 之后的举手和取消合计几次
     def self.actions_since(listing:, user:, since:)
       hands = where(listing:, user:)
@@ -25,6 +69,7 @@ end
 # Table name: kuu_market_raised_hands
 #
 #  id           :bigint           not null, primary key
+#  alerted_at   :datetime
 #  cancelled_at :datetime
 #  ended_at     :datetime
 #  created_at   :datetime         not null

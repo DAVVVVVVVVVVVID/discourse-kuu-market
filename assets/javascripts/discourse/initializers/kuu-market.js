@@ -1,9 +1,11 @@
+import { ajax } from "discourse/lib/ajax";
 import CustomNotification from "discourse/lib/notification-types/custom";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import Category from "discourse/models/category";
 import { i18n } from "discourse-i18n";
 import ListingPanel from "../components/kuu-market/listing-panel";
 import ListingTopicLink from "../components/kuu-market/listing-topic-link";
+import HandAlert from "../components/kuu-market/modal/hand-alert";
 import ListingForm from "../components/kuu-market/modal/listing-form";
 import TopicTitlePrefix from "../components/kuu-market/topic-title-prefix";
 import { marketCategoryId } from "../lib/kuu-market";
@@ -42,6 +44,27 @@ export default {
 
     withPluginApi((api) => {
       api.renderInOutlet("topic-above-posts", ListingPanel);
+
+      // 有新的人举手时，发帖人打开论坛后弹窗提醒一次（Issue #5 第二期）。等第一个页面渲染好再弹；
+      // 关掉以后告诉后端这批看过了，弹窗打开以后才举手的人下次再弹
+      const currentUser = api.getCurrentUser();
+      if (currentUser?.kuu_market_hand_alerts) {
+        let shown = false;
+        api.onPageChange(async () => {
+          const alerts = currentUser.kuu_market_hand_alerts;
+          if (shown || !alerts) {
+            return;
+          }
+          shown = true;
+
+          await modal.show(HandAlert, { model: alerts });
+          currentUser.set("kuu_market_hand_alerts", null);
+          await ajax("/kuu-market/hand-alerts/dismiss.json", {
+            type: "PUT",
+            data: { up_to_id: alerts.up_to_id },
+          });
+        });
+      }
 
       // 标题开头的【出售】【赠送】【求购】单独上色（2026-10-19 David 定），只在列表标题和帖子页大标题。
       // 不改模型的 fancyTitle：别的地方（比如主题拿标题当图片 alt）要的是纯文字

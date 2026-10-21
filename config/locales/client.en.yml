@@ -118,6 +118,18 @@ en:
         failed:
           raised: "Hand raised, but the chat message could not be sent. You can reply to the topic instead."
           cancelled: "Hand lowered, but the chat message could not be sent."
+      hand_alert:
+        title: "People raised their hand"
+        line:
+          sell:
+            one: "%{count} person wants to buy your “%{item}”"
+            other: "%{count} people want to buy your “%{item}”"
+          buy:
+            one: "%{count} person can offer the “%{item}” you're looking for"
+            other: "%{count} people can offer the “%{item}” you're looking for"
+        hint: "Check your direct messages!"
+        open_chat: "Open messages"
+        close: "Got it"
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"
