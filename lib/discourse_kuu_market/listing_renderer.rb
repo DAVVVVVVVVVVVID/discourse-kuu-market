@@ -58,7 +58,7 @@ module DiscourseKuuMarket
     def hand_message(event)
       in_site_locale do
         [
-          (first_photo_markdown if event == :raised),
+          (linked_first_photo_markdown if event == :raised),
           "[#{escape(title)}](#{@listing.topic.url})",
           t("hand_messages.#{event}.#{@listing.kind}"),
         ].compact.join("\n")
@@ -83,10 +83,12 @@ module DiscourseKuuMarket
       images.size > 1 ? ["[grid]", *images, "[/grid]"].join("\n") : images.first
     end
 
-    # 私密的图不发进私聊
-    def first_photo_markdown
+    # 私密的图不发进私聊。图片包在帖子链接里：段落以图片开头时，chat 会在图片上方加一行显示地址的折叠标题
+    def linked_first_photo_markdown
       upload = Upload.find_by(id: @listing.upload_ids.first)
-      UploadMarkdown.new(upload).image_markdown(display_name: "") if upload && !upload.secure
+      return if upload.nil? || upload.secure
+
+      "[#{UploadMarkdown.new(upload).image_markdown(display_name: "")}](#{@listing.topic.url})"
     end
 
     def fields_markdown

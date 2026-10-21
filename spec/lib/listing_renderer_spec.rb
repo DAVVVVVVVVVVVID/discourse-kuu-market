@@ -135,7 +135,7 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
 
       it "shows the first photo, links the listing and greets the seller" do
         expect(renderer.hand_message(:raised)).to eq(<<~MD.strip)
-          ![|800x600](#{photo.short_url})
+          [![|800x600](#{photo.short_url})](#{topic.url})
           [【出售】宜家书桌 · ¥3,000](#{topic.url})
           同学您好！我想购买这件物品，可以咨询一下吗？
         MD
