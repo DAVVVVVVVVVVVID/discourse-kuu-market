@@ -88,5 +88,55 @@ module DiscourseKuuMarket
         end
       end
     end
+
+    def raise_hand
+      Listing::RaiseHand.call(service_params) do
+        on_success { |delivery:, listing:| render_hand_result(delivery, listing) }
+        on_failed_contract do |contract|
+          render(
+            json: failed_json.merge(errors: contract.errors.full_messages),
+            status: :bad_request,
+          )
+        end
+        on_model_not_found(:listing) { raise Discourse::NotFound }
+        on_failed_policy(:can_raise_hand) { raise Discourse::InvalidAccess }
+        on_failed_policy(:hand_not_raised) do
+          render(
+            json: failed_json.merge(errors: [I18n.t("kuu_market.errors.hand_already_raised")]),
+            status: :unprocessable_content,
+          )
+        end
+        on_failed_policy(:within_daily_limit) { |policy| render_too_many_hand_actions(policy) }
+      end
+    end
+
+    def cancel_hand
+      Listing::CancelHand.call(service_params) do
+        on_success { |delivery:, listing:| render_hand_result(delivery, listing) }
+        on_failed_contract do |contract|
+          render(
+            json: failed_json.merge(errors: contract.errors.full_messages),
+            status: :bad_request,
+          )
+        end
+        on_model_not_found(:listing) { raise Discourse::NotFound }
+        on_failed_policy(:listing_open) { raise Discourse::InvalidAccess }
+        on_model_not_found(:hand) { raise Discourse::NotFound }
+        on_failed_policy(:within_daily_limit) { |policy| render_too_many_hand_actions(policy) }
+      end
+    end
+
+    private
+
+    def render_hand_result(delivery, listing)
+      render json: {
+               delivery:,
+               listing: TopicListingSerializer.new(listing, scope: guardian, root: false).as_json,
+             }
+    end
+
+    def render_too_many_hand_actions(policy)
+      render(json: failed_json.merge(errors: [policy.reason]), status: :too_many_requests)
+    end
   end
 end

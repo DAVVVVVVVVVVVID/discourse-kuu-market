@@ -1,9 +1,16 @@
 # frozen_string_literal: true
 
 module DiscourseKuuMarket
-  # 帖子页用：状态显示、切换按钮，以及修改表单回填的字段和照片
+  # 帖子页用：状态显示、切换按钮，修改表单回填的字段和照片，以及举手排队
   class TopicListingSerializer < ListingSerializer
-    attributes :photos, :can_manage, :statuses_reachable, :expires_at, :title_prefix
+    attributes :photos,
+               :can_manage,
+               :statuses_reachable,
+               :expires_at,
+               :title_prefix,
+               :raised_hands,
+               :can_raise_hand,
+               :hand_raised
 
     def title_prefix
       ListingRenderer.new(object).title_prefix
@@ -33,6 +40,32 @@ module DiscourseKuuMarket
       [Listing.active_status_for(object.kind), Listing.ended_status_for(object.kind)].select do
         object.can_change_to?(it)
       end
+    end
+
+    # 头像所有人都能看到，按举手顺序
+    def raised_hands
+      @raised_hands ||=
+        object
+          .raised_hands
+          .queue
+          .includes(:user)
+          .map { |hand| BasicUserSerializer.new(hand.user, scope:, root: false).as_json }
+    end
+
+    def include_raised_hands?
+      object.active?
+    end
+
+    def can_raise_hand
+      scope.can_raise_kuu_market_hand?(object)
+    end
+
+    def hand_raised
+      raised_hands.any? { it[:id] == scope.user&.id }
+    end
+
+    def include_hand_raised?
+      include_raised_hands? && scope.authenticated?
     end
 
     def include_photos?

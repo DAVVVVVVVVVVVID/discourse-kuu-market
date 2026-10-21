@@ -14,6 +14,7 @@ register_asset "stylesheets/common/kuu-market.scss"
 register_svg_icon "clock-rotate-left"
 register_svg_icon "cart-shopping"
 register_svg_icon "magnifying-glass"
+register_svg_icon "hand"
 
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"
@@ -48,6 +49,14 @@ after_initialize do
     return true if is_staff?
 
     topic.user_id == user.id && !user.silenced?
+  end
+
+  # 在售 / 求购中的帖子，作者以外的登录用户可以举手（包括管理员）；已出、结束、过期的不行
+  add_to_class(:guardian, :can_raise_kuu_market_hand?) do |listing|
+    return false if anonymous? || user.silenced?
+    return false if listing.topic_deleted? || !listing.in_market? || !listing.active?
+
+    listing.topic.user_id != user.id && can_see?(listing.topic)
   end
 
   add_to_serializer(

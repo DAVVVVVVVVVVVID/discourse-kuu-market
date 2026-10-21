@@ -53,6 +53,18 @@ module DiscourseKuuMarket
       end
     end
 
+    # 举手 / 取消时以举手人的身份发给作者的聊天私聊。两个人之间只有一个私聊对话，
+    # 同一个人对几件商品举手都在里面，所以每条都带商品名和链接
+    def hand_message(event)
+      in_site_locale do
+        [
+          (linked_first_photo_markdown if event == :raised),
+          "[#{escape(title)}](#{@listing.topic.url})",
+          t("hand_messages.#{event}.#{@listing.kind}"),
+        ].compact.join("\n")
+      end
+    end
+
     private
 
     def title_key
@@ -69,6 +81,14 @@ module DiscourseKuuMarket
       return if images.empty?
 
       images.size > 1 ? ["[grid]", *images, "[/grid]"].join("\n") : images.first
+    end
+
+    # 私密的图不发进私聊。图片包在帖子链接里：段落以图片开头时，chat 会在图片上方加一行显示地址的折叠标题
+    def linked_first_photo_markdown
+      upload = Upload.find_by(id: @listing.upload_ids.first)
+      return if upload.nil? || upload.secure
+
+      "[#{UploadMarkdown.new(upload).image_markdown(display_name: "")}](#{@listing.topic.url})"
     end
 
     def fields_markdown

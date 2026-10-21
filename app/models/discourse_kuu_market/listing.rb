@@ -32,6 +32,7 @@ module DiscourseKuuMarket
 
     # 表单内容在话题建出来之前就要校验，所以这里不要求 topic；数据库里 topic_id 不能为空
     belongs_to :topic, -> { with_deleted }, optional: true
+    has_many :raised_hands, dependent: :delete_all
 
     validates :topic_id, uniqueness: { allow_nil: true }
     validates :item_name, presence: true, length: { maximum: ITEM_NAME_MAX_LENGTH }

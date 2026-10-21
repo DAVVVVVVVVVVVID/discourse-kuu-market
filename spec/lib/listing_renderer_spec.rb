@@ -120,6 +120,71 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
     end
   end
 
+  describe "#hand_message" do
+    fab!(:topic, :topic_with_op)
+
+    context "when raising a hand on a sell listing" do
+      let(:listing) do
+        Fabricate.build(
+          :kuu_market_listing,
+          topic:,
+          price: 3000,
+          upload_ids: [photo.id, other_photo.id],
+        )
+      end
+
+      it "shows the first photo, links the listing and greets the seller" do
+        expect(renderer.hand_message(:raised)).to eq(<<~MD.strip)
+          [![|800x600](#{photo.short_url})](#{topic.url})
+          [【出售】宜家书桌 · ¥3,000](#{topic.url})
+          同学您好！我想购买这件物品，可以咨询一下吗？
+        MD
+      end
+    end
+
+    context "when raising a hand on a buy listing without a reference photo" do
+      let(:listing) do
+        Fabricate.build(:kuu_market_buy_listing, topic:, budget_min: nil, budget_max: 10_000)
+      end
+
+      it "only links the listing" do
+        expect(renderer.hand_message(:raised)).to eq(<<~MD.strip)
+          [【求购】自行车 · ¥10,000 以内](#{topic.url})
+          同学您好！我这里有你想要的物品，可以咨询一下吗？
+        MD
+      end
+    end
+
+    context "when lowering a hand" do
+      let(:listing) { Fabricate.build(:kuu_market_listing, topic:, upload_ids: [photo.id]) }
+
+      it "leaves out the photo" do
+        expect(renderer.hand_message(:cancelled)).to eq(<<~MD.strip)
+          [【出售】宜家书桌 · ¥3,000](#{topic.url})
+          我暂时不需要了，取消购买请求
+        MD
+      end
+    end
+
+    context "when the item name contains Markdown" do
+      let(:listing) { Fabricate.build(:kuu_market_buy_listing, topic:, item_name: "[书] 架") }
+
+      it "keeps the link intact" do
+        expect(renderer.hand_message(:cancelled)).to start_with("[【求购】\\[书\\] 架 · ¥5,000–10,000](")
+      end
+    end
+
+    context "when the photo is private" do
+      let(:listing) { Fabricate.build(:kuu_market_listing, topic:, upload_ids: [photo.id]) }
+
+      before { photo.update!(secure: true) }
+
+      it "leaves it out" do
+        expect(renderer.hand_message(:raised)).to start_with("[【出售】")
+      end
+    end
+  end
+
   describe "#raw" do
     context "when selling" do
       let(:listing) do
