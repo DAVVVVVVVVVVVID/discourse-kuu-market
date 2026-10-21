@@ -26,7 +26,8 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
   needs.pretender((server, helper) => {
     server.get("/latest.json", () => {
       const json = cloneJSON(DiscoveryFixtures["/latest.json"]);
-      const [withPhoto, withoutPhoto, free, buy, sold] = json.topic_list.topics;
+      const [withPhoto, withoutPhoto, free, buy, sold, expired] =
+        json.topic_list.topics;
       listing(withPhoto, "sell", "selling", {
         item_name: "MacBook Air M2",
         price: "¥52,000",
@@ -47,6 +48,10 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
         has_photos: true,
       }).image_url = "/images/reference.jpg";
       listing(sold, "sell", "sold", { item_name: "椅子", price: "¥500" });
+      listing(expired, "buy", "expired", {
+        item_name: "台灯",
+        price: "¥1,000 以内",
+      });
       return helper.response(json);
     });
   });
@@ -58,7 +63,7 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
   test("shows a product card for each listing", async function (assert) {
     await visit("/latest");
 
-    assert.dom(".kuu-market-card").exists({ count: 5 }, "only listings");
+    assert.dom(".kuu-market-card").exists({ count: 6 }, "only listings");
     assert
       .dom(
         ".topic-list-item.kuu-market-listing.kuu-market-kind-buy.kuu-market-status-buying"
@@ -92,7 +97,10 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
       .dom(`${card(4)} .kuu-market-card__status`)
       .hasText(i18n("kuu_market.card_statuses.buying"));
 
-    assert.dom(card(5)).hasClass("--ended", "ended listings are faded");
+    assert
+      .dom(card(5))
+      .doesNotHaveClass("--expired", "sold listings are not faded");
+    assert.dom(card(6)).hasClass("--expired", "expired listings are faded");
   });
 
   test("keeps core's title link behaviour", async function (assert) {
@@ -111,9 +119,9 @@ acceptance("KUU market | listing cards in topic lists", function (needs) {
     await visit("/latest");
 
     assert
-      .dom(".topic-list-item:nth-child(6) a.title.raw-topic-link")
+      .dom(".topic-list-item:nth-child(7) a.title.raw-topic-link")
       .exists("ordinary topics keep core's title link");
-    assert.dom(".topic-list-item:nth-child(6) .kuu-market-card").doesNotExist();
+    assert.dom(".topic-list-item:nth-child(7) .kuu-market-card").doesNotExist();
   });
 
   test("leaves the topic model's title plain", function (assert) {

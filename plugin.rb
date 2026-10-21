@@ -42,6 +42,15 @@ after_initialize do
 
   register_topic_preloader_associations(:kuu_market_listing) { SiteSetting.kuu_market_enabled }
 
+  # 已出 / 已购买的帖子是隐藏话题，列表和搜索里都没有；但发帖人主页的「话题」里所有人都能看到
+  # （Issue #5 规则 7）。只在这个列表、只在 core 按 visible 过滤了的时候把它们加回来，过期的不加
+  register_modifier(:topic_query_create_list_topics) do |topics, options, _topic_query|
+    next topics if !SiteSetting.kuu_market_enabled
+    next topics if options[:filter] != :user_topics || options[:visible] != true
+
+    DiscourseKuuMarket::Listing.with_deals_visible(topics)
+  end
+
   # 作者本人和管理员可以随时修改二手帖、切换状态，不受编辑时限限制；作者被禁言时不行
   add_to_class(:guardian, :can_manage_kuu_market_listing?) do |listing|
     topic = listing.topic

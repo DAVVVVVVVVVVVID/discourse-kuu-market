@@ -10,7 +10,8 @@ module DiscourseKuuMarket
                :title_prefix,
                :raised_hands,
                :can_raise_hand,
-               :hand_raised
+               :hand_raised,
+               :deal_user
 
     def title_prefix
       ListingRenderer.new(object).title_prefix
@@ -54,6 +55,15 @@ module DiscourseKuuMarket
 
     def include_raised_hands?
       object.active?
+    end
+
+    # 已出 / 已购买帖子上的「成交对象」，所有人都能看到；选了「无」时没有
+    def deal_user
+      BasicUserSerializer.new(object.deal_user, scope:, root: false).as_json
+    end
+
+    def include_deal_user?
+      object.closes_replies? && object.deal_user.present?
     end
 
     def can_raise_hand

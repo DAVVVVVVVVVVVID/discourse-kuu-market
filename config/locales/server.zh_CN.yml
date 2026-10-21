@@ -17,6 +17,7 @@ zh_CN:
       status_unreachable: "这个帖子不能切换到这个状态。"
       edit_with_market_form: "二手帖的标题和第一楼由表单生成，请用帖子上的「修改」按钮修改。"
       hand_already_raised: "你已经举过手了。"
+      deal_user_not_in_queue: "成交对象要从正在举手的同学里选。"
       too_many_hand_actions: "反复举手发私信会造成困扰哦！请明天再试吧!"
     listing:
       title:
@@ -38,6 +39,9 @@ zh_CN:
         cancelled:
           sell: "我暂时不需要了，取消购买请求"
           buy: "我这边暂时出不了了，取消"
+        dealt:
+          sell: "抱歉，货物已售出"
+          buy: "抱歉，已经收到东西啦"
       field_line: "- **%{label}**：%{value}"
       fields:
         price: "价格"

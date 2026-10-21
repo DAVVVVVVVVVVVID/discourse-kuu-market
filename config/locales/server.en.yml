@@ -17,6 +17,7 @@ en:
       status_unreachable: "This listing cannot be switched to that status."
       edit_with_market_form: "The title and first post of a listing come from its form. Use the \"Edit\" button on the listing instead."
       hand_already_raised: "You have already raised your hand."
+      deal_user_not_in_queue: "Choose the buyer or seller from the people who raised their hand."
       too_many_hand_actions: "Raising and lowering your hand over and over sends the author a lot of messages. Please try again tomorrow!"
     listing:
       title:
@@ -38,6 +39,9 @@ en:
         cancelled:
           sell: "I no longer need it, so I'm withdrawing my request."
           buy: "I can't offer it for now, so I'm withdrawing."
+        dealt:
+          sell: "Sorry, this has been sold."
+          buy: "Sorry, I've already got one."
       field_line: "- **%{label}:** %{value}"
       fields:
         price: "Price"

@@ -8,7 +8,11 @@ import ListingForm from "../components/kuu-market/modal/listing-form";
 import TopicTitlePrefix from "../components/kuu-market/topic-title-prefix";
 import { marketCategoryId } from "../lib/kuu-market";
 
-const EXPIRED_MESSAGE = "kuu_market.notifications.expired";
+// 作者收到的「你的帖子过期了」和举手人收到的「举手的帖子过期了」
+const EXPIRY_MESSAGES = {
+  "kuu_market.notifications.expired": "expired",
+  "kuu_market.notifications.hand_expired": "hand_expired",
+};
 
 export default {
   name: "kuu-market",
@@ -81,23 +85,25 @@ export default {
         "custom",
         () =>
           class extends CustomNotification {
-            get #isExpiry() {
-              return this.notification.data.message === EXPIRED_MESSAGE;
+            get #expiryKey() {
+              return EXPIRY_MESSAGES[this.notification.data.message];
             }
 
             get icon() {
-              return this.#isExpiry ? "clock-rotate-left" : super.icon;
+              return this.#expiryKey ? "clock-rotate-left" : super.icon;
             }
 
             get label() {
-              return this.#isExpiry
-                ? i18n(`kuu_market.notifications.expired_${this.#kind}`)
+              return this.#expiryKey
+                ? i18n(
+                    `kuu_market.notifications.${this.#expiryKey}_${this.#kind}`
+                  )
                 : super.label;
             }
 
             get linkTitle() {
-              return this.#isExpiry
-                ? i18n("kuu_market.notifications.expired_title")
+              return this.#expiryKey
+                ? i18n(`kuu_market.notifications.${this.#expiryKey}_title`)
                 : super.linkTitle;
             }
 

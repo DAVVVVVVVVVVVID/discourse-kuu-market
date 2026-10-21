@@ -109,6 +109,28 @@
       background: var(--kuu-market-mist);
       color: var(--kuu-market-navy);
     }
+
+    // 已出 / 已购买不再是灰色（Issue #5 第三期）
+    &.kuu-market-status-sold,
+    &.kuu-market-status-closed {
+      background: var(--kuu-market-navy);
+      color: var(--secondary);
+    }
+  }
+
+  &__deal {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    color: var(--primary-high);
+  }
+
+  &__deal-user {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    color: var(--primary);
+    font-weight: bold;
   }
 
   &__expiry {
@@ -218,7 +240,7 @@
   color: var(--primary);
   font-weight: normal;
 
-  &.--ended {
+  &.--expired {
     opacity: 0.6;
   }
 
@@ -309,7 +331,8 @@
   }
 }
 
-// 胶囊标签：沿用 KUU 主题组件原来的样式和颜色（在售绿、求购蓝、已出 / 已结束 / 已过期灰）
+// 胶囊标签：沿用 KUU 主题组件原来的样式和颜色（在售绿、求购蓝、已过期灰）；
+// 已出 / 已购买用藏青（2026-10-21 起不再是灰色）
 @mixin kuu-market-card-pill($bg, $fg, $dot) {
   color: $fg;
   background:
@@ -334,6 +357,11 @@
   &.kuu-market-status-buying {
     @include kuu-market-card-pill(#e4eefa, #1f5fa8, #3478c6);
   }
+
+  &.kuu-market-status-sold,
+  &.kuu-market-status-closed {
+    @include kuu-market-card-pill(#e3e8ef, #0a2d56, #0a2d56);
+  }
 }
 
 // 手机上卡片窄：先把图片列、价格和状态缩小一点，常见的「¥10,000 以内」能完整放下；
@@ -355,5 +383,17 @@ html.mobile-view
 
   .kuu-market-card__status {
     font-size: var(--font-down-2);
+  }
+}
+
+.kuu-market-deal-form {
+  .form-kit__control-radio-label {
+    align-items: center;
+  }
+
+  &__user {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
   }
 }

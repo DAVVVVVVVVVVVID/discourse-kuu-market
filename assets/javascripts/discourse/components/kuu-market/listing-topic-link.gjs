@@ -34,8 +34,9 @@ export default class ListingTopicLink extends Component {
     return this.siteSettings.kuu_market_placeholder_image;
   }
 
-  get isEnded() {
-    return !["selling", "buying"].includes(this.topic.kuu_market_status);
+  // 已出 / 已购买不调淡（2026-10-21 David 定，Issue #5），只有过期的调淡
+  get isExpired() {
+    return this.topic.kuu_market_status === "expired";
   }
 
   get statusLabel() {
@@ -62,7 +63,7 @@ export default class ListingTopicLink extends Component {
     {{~#if this.card~}}
       <a
         class="title raw-link raw-topic-link kuu-market-card
-          {{if this.isEnded '--ended'}}"
+          {{if this.isExpired '--expired'}}"
         data-topic-id={{this.topic.id}}
         href={{this.url}}
         {{on "focus" this.highlightItem}}
