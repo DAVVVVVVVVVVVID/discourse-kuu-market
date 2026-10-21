@@ -149,5 +149,40 @@ RSpec.describe DiscourseKuuMarket::Listing::Expire do
         expect(author_notifications.last.data_hash).to include(kind: "buy")
       end
     end
+
+    context "with people in the queue" do
+      fab!(:waiting, :user)
+      fab!(:lowered, :user)
+
+      before do
+        listing.raised_hands.create!(user: waiting)
+        listing.raised_hands.create!(user: lowered, cancelled_at: 1.day.ago)
+      end
+
+      it "empties the queue" do
+        result
+        expect(listing.raised_hands.active).to be_empty
+      end
+
+      it "tells the people still waiting, with a site notification" do
+        result
+
+        notification = Notification.find_by(user: waiting)
+        expect(notification).to have_attributes(
+          notification_type: Notification.types[:custom],
+          topic_id: topic.id,
+          post_number: 1,
+        )
+        expect(notification.data_hash).to include(
+          message: "kuu_market.notifications.hand_expired",
+          kind: "sell",
+        )
+        expect(Notification.where(user: lowered)).to be_empty
+      end
+
+      it "does not send chat messages" do
+        expect { result }.not_to change { Chat::Message.count }
+      end
+    end
   end
 end

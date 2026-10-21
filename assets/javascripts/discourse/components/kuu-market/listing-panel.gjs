@@ -8,11 +8,13 @@ import { popupAjaxError } from "discourse/lib/ajax-error";
 import { longDate } from "discourse/lib/formatter";
 import { eq } from "discourse/truth-helpers";
 import DButton from "discourse/ui-kit/d-button";
+import dAvatar from "discourse/ui-kit/helpers/d-avatar";
 import { i18n } from "discourse-i18n";
+import DealPicker from "./modal/deal-picker";
 import ListingForm from "./modal/listing-form";
 import RaisedHands from "./raised-hands";
 
-// 帖子页标题下方：所有人看到状态和举手排队；作者和管理员看到过期时间、切换状态和「修改」按钮
+// 帖子页标题下方：所有人看到状态、举手排队和成交对象；作者和管理员看到过期时间、切换状态和「修改」按钮
 export default class ListingPanel extends Component {
   @service dialog;
   @service modal;
@@ -51,7 +53,14 @@ export default class ListingPanel extends Component {
 
   @action
   changeStatus(status) {
-    if (this.#endsListing(status)) {
+    if (this.#endsListing(status) && this.listing.raised_hands?.length) {
+      this.modal.show(DealPicker, {
+        model: {
+          listing: this.listing,
+          onConfirm: (dealUserId) => this.#saveStatus(status, dealUserId),
+        },
+      });
+    } else if (this.#endsListing(status)) {
       this.dialog.yesNoConfirm({
         message: i18n(`kuu_market.panel.confirm_end.${this.listing.kind}`),
         didConfirm: () => this.#saveStatus(status),
@@ -76,13 +85,17 @@ export default class ListingPanel extends Component {
     return status === "sold" || status === "closed";
   }
 
-  async #saveStatus(status) {
+  async #saveStatus(status, dealUserId = null) {
     this.changingTo = status;
 
     try {
+      const data = { status };
+      if (dealUserId) {
+        data.deal_user_id = dealUserId;
+      }
       const result = await ajax(
         `/kuu-market/listings/${this.listing.topic_id}/status.json`,
-        { type: "PUT", data: { status } }
+        { type: "PUT", data }
       );
       this.#announce(status, result);
       this.router.refresh();
@@ -117,6 +130,19 @@ export default class ListingPanel extends Component {
         >
           {{this.statusLabel}}
         </span>
+
+        {{#if this.listing.deal_user}}
+          <span class="kuu-market-panel__deal">
+            {{i18n "kuu_market.panel.deal.partner"}}
+            <a
+              class="trigger-user-card kuu-market-panel__deal-user"
+              data-user-card={{this.listing.deal_user.username}}
+            >
+              {{dAvatar this.listing.deal_user imageSize="small"}}
+              {{this.listing.deal_user.username}}
+            </a>
+          </span>
+        {{/if}}
 
         {{#if this.expiresOn}}
           <span class="kuu-market-panel__expiry">

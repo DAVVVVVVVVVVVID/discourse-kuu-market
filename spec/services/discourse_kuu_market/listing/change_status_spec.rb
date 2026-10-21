@@ -226,5 +226,103 @@ RSpec.describe DiscourseKuuMarket::Listing::ChangeStatus do
         expect { result }.to change { listing.reload.status }.from("buying").to("closed")
       end
     end
+
+    context "with people in the queue" do
+      fab!(:first_in_line, :user)
+      fab!(:second_in_line, :user)
+      fab!(:third_in_line, :user)
+
+      let(:params) { { topic_id:, status:, deal_user_id: } }
+      let(:deal_user_id) { second_in_line.id }
+
+      before do
+        [first_in_line, second_in_line, third_in_line].each_with_index do |user, index|
+          listing.raised_hands.create!(user:, created_at: (3 - index).hours.ago)
+        end
+      end
+
+      context "when marking it as sold to one of them" do
+        it { is_expected.to run_successfully }
+
+        it "remembers who bought it" do
+          expect { result }.to change { listing.reload.deal_user }.from(nil).to(second_in_line)
+        end
+
+        it "ends the queue" do
+          result
+          expect(listing.raised_hands.active).to be_empty
+          expect(listing.raised_hands.pluck(:ended_at)).to all(be_present)
+        end
+
+        it "lets the author tell everyone else it was sold" do
+          expect_enqueued_with(
+            job: Jobs::KuuMarketMessageDismissedHands,
+            args: {
+              topic_id: topic.id,
+              user_ids: [first_in_line.id, third_in_line.id],
+            },
+          ) { result }
+        end
+      end
+
+      context "when marking it as sold elsewhere" do
+        let(:deal_user_id) { nil }
+
+        it "has no buyer and tells everyone in the queue" do
+          expect_enqueued_with(
+            job: Jobs::KuuMarketMessageDismissedHands,
+            args: {
+              topic_id: topic.id,
+              user_ids: [first_in_line.id, second_in_line.id, third_in_line.id],
+            },
+          ) { result }
+          expect(listing.reload.deal_user).to be_nil
+        end
+      end
+
+      context "when the buyer is not in the queue" do
+        let(:deal_user_id) { Fabricate(:user).id }
+
+        it { is_expected.to fail_a_policy(:deal_user_in_queue) }
+      end
+
+      context "when the buyer lowered their hand" do
+        before do
+          listing.raised_hands.find_by(user: second_in_line).update!(cancelled_at: 1.minute.ago)
+        end
+
+        it { is_expected.to fail_a_policy(:deal_user_in_queue) }
+      end
+
+      context "when the buyer does not exist" do
+        let(:deal_user_id) { 0 }
+
+        it { is_expected.to fail_a_policy(:deal_user_in_queue) }
+      end
+
+      context "when choosing a buyer without ending the listing" do
+        let(:status) { "selling" }
+
+        before { listing.update!(status: "sold") }
+
+        it { is_expected.to fail_a_policy(:deal_user_in_queue) }
+      end
+    end
+
+    context "when relisting a listing that was sold to someone" do
+      fab!(:buyer, :user)
+
+      let(:status) { "selling" }
+
+      before { listing.update!(status: "sold", deal_user: buyer) }
+
+      it "forgets the buyer" do
+        expect { result }.to change { listing.reload.deal_user }.from(buyer).to(nil)
+      end
+
+      it "does not message anyone" do
+        expect_not_enqueued_with(job: Jobs::KuuMarketMessageDismissedHands) { result }
+      end
+    end
   end
 end

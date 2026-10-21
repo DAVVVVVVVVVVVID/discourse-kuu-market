@@ -156,6 +156,14 @@ RSpec.describe DiscourseKuuMarket::Listing::RaiseHand do
       end
     end
 
+    context "when their earlier place ended because the listing was sold and relisted" do
+      before do
+        listing.raised_hands.create!(user: actor, created_at: 2.hours.ago, ended_at: 1.hour.ago)
+      end
+
+      it { is_expected.to run_successfully }
+    end
+
     context "when the actor raised and lowered their hand before" do
       before do
         listing.raised_hands.create!(user: actor, created_at: 2.days.ago, cancelled_at: 2.days.ago)

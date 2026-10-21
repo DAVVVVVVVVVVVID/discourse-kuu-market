@@ -53,13 +53,13 @@ en:
         selling: "For sale"
         sold: "Sold"
         buying: "Wanted"
-        closed: "Closed"
+        closed: "Bought"
         expired: "Expired"
       statuses:
         selling: "For sale"
         sold: "Sold"
         buying: "Wanted"
-        closed: "Closed"
+        closed: "Bought"
         expired: "Expired"
       panel:
         edit: "Edit"
@@ -68,10 +68,19 @@ en:
           selling: "Relist"
           sold: "Mark as sold"
           buying: "Keep looking"
-          closed: "Mark as closed"
+          closed: "Mark as bought"
         confirm_end:
-          sell: "Marking it as sold closes replies and hides it from other people's lists and search (the link still works). You can relist it later. Continue?"
-          buy: "Marking it as closed closes replies and hides it from other people's lists and search (the link still works). You can keep looking later. Continue?"
+          sell: "Marking it as sold closes replies and hides it from lists and search; people can still find it under Topics on your profile (and the link still works). You can relist it later. Continue?"
+          buy: "Marking it as bought closes replies and hides it from lists and search; people can still find it under Topics on your profile (and the link still works). You can keep looking later. Continue?"
+        deal:
+          title:
+            sell: "Mark as sold: who bought it?"
+            buy: "Mark as bought: who sold it to you?"
+          description:
+            sell: "Pick one of the people who raised their hand. Everyone else gets a chat message from you saying it has been sold. Replies will be closed and the listing leaves lists and search, but people can still find it under Topics on your profile."
+            buy: "Pick one of the people who raised their hand. Everyone else gets a chat message from you saying you already got one. Replies will be closed and the listing leaves lists and search, but people can still find it under Topics on your profile."
+          none: "Nobody here (dealt elsewhere)"
+          partner: "Dealt with"
         ended: "Status updated."
         relisted_and_bumped: "Relisted and bumped to the top of Latest."
         relisted_without_bump: "Relisted. It was not bumped this time (at most once every %{days} days); relisting after %{date} will bump it."
@@ -113,3 +122,6 @@ en:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"
         expired_title: "Listing expired"
+        hand_expired_sell: "The seller's listing has expired"
+        hand_expired_buy: "The wanted listing has expired"
+        hand_expired_title: "A listing you raised your hand on has expired"

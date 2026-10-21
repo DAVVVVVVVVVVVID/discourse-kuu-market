@@ -148,6 +148,39 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
       expect(topic_listing).to include("hand_raised" => false, "can_raise_hand" => false)
     end
 
+    it "shows everyone who it was sold to" do
+      sign_in(author)
+      put "/kuu-market/listings/#{topic.id}/status.json",
+          params: {
+            status: "sold",
+            deal_user_id: early.id,
+          }
+      expect(response.status).to eq(200)
+
+      sign_out
+      expect(topic_listing["deal_user"]).to include("username" => early.username)
+    end
+
+    it "refuses a buyer who did not raise their hand" do
+      sign_in(author)
+      put "/kuu-market/listings/#{topic.id}/status.json",
+          params: {
+            status: "sold",
+            deal_user_id: buyer.id,
+          }
+
+      expect(response.status).to eq(422)
+      expect(response.parsed_body["errors"]).to eq(
+        [I18n.t("kuu_market.errors.deal_user_not_in_queue")],
+      )
+    end
+
+    it "shows no buyer when it was sold elsewhere" do
+      listing.update!(status: "sold")
+
+      expect(topic_listing).not_to include("deal_user")
+    end
+
     it "does not show the queue once the listing is sold" do
       listing.update!(status: "sold")
 

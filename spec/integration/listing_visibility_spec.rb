@@ -133,10 +133,25 @@ RSpec.describe "Who sees listings that are no longer in progress" do
       expect(suggested_ids).not_to include(*hidden_ids)
     end
 
-    it "hides them from the seller's profile" do
+    # 已出 / 已购买的帖子在发帖人主页「话题」里所有人都能看到（Issue #5 规则 7），过期的不行
+    it "shows sold listings, but not expired ones, under Topics on the seller's profile" do
       SiteSetting.hide_new_user_profiles = false
 
+      expect(topic_ids("/topics/created-by/#{seller.username}")).to contain_exactly(
+        selling.id,
+        sold.id,
+      )
+    end
+
+    it "keeps listings unlisted by staff out of the seller's profile" do
+      SiteSetting.hide_new_user_profiles = false
+      sold.kuu_market_listing.update!(unlisted_by_plugin: false)
+
       expect(topic_ids("/topics/created-by/#{seller.username}")).to contain_exactly(selling.id)
+    end
+
+    it "hides them from the rest of the seller's activity" do
+      SiteSetting.hide_new_user_profiles = false
 
       get "/user_actions.json", params: { username: seller.username, filter: UserAction::NEW_TOPIC }
       expect(response.parsed_body["user_actions"].map { it["topic_id"] }).to contain_exactly(
@@ -156,6 +171,21 @@ RSpec.describe "Who sees listings that are no longer in progress" do
       get "/t/#{sold.id}.json"
 
       expect(response.status).to eq(200)
+    end
+  end
+
+  context "when a visitor who is not logged in browses" do
+    it "shows sold listings under Topics on the seller's profile" do
+      SiteSetting.hide_new_user_profiles = false
+
+      expect(topic_ids("/topics/created-by/#{seller.username}")).to contain_exactly(
+        selling.id,
+        sold.id,
+      )
+    end
+
+    it "keeps them out of Latest" do
+      expect(topic_ids("/latest.json")).not_to include(*hidden_ids)
     end
   end
 

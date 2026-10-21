@@ -33,6 +33,8 @@ module DiscourseKuuMarket
     # 表单内容在话题建出来之前就要校验，所以这里不要求 topic；数据库里 topic_id 不能为空
     belongs_to :topic, -> { with_deleted }, optional: true
     has_many :raised_hands, dependent: :delete_all
+    # 成交对象：成交时从举手的人里选，可以不选（在其他渠道成交）
+    belongs_to :deal_user, class_name: "User", optional: true
 
     validates :topic_id, uniqueness: { allow_nil: true }
     validates :item_name, presence: true, length: { maximum: ITEM_NAME_MAX_LENGTH }
@@ -52,6 +54,7 @@ module DiscourseKuuMarket
     validate :sell_fields, if: :sell?
     validate :buy_fields, if: :buy?
     validate :photos_are_images
+    validate :deal_only_when_ended
 
     # 新发的帖子从现在开始在售或求购，30 天过期和 7 天顶帖都从现在算
     def self.open(attributes)
@@ -72,6 +75,20 @@ module DiscourseKuuMarket
         .where.not(topic_id: Post.where(post_number: 1, user_deleted: true).select(:topic_id))
         .where(status: ACTIVE_STATUS.values)
         .where("kuu_market_listings.active_since <= ?", expiry_cutoff(at))
+    end
+
+    # 在按 visible 过滤过的话题列表里，加回插件隐藏的已出 / 已购买帖子。管理员手动隐藏的仍然不显示
+    def self.with_deals_visible(topics)
+      deals =
+        where(status: ENDED_STATUS.values, unlisted_by_plugin: true).joins(:topic).where(
+          topics: {
+            category_id: SiteSetting.kuu_market_category.to_i,
+          },
+        )
+      topics.unscope(where: :visible).where(
+        "topics.visible OR topics.id IN (?)",
+        deals.select(:topic_id),
+      )
     end
 
     def self.expiry_cutoff(at)
@@ -122,10 +139,19 @@ module DiscourseKuuMarket
         [self.class.active_status_for(kind), self.class.ended_status_for(kind)].include?(new_status)
     end
 
-    # 改回进行中时 30 天过期重新计时
-    def change_status(new_status, at: Time.zone.now)
+    # 改回进行中时 30 天过期重新计时，成交对象清掉
+    def change_status(new_status, deal_user: nil, at: Time.zone.now)
       self.status = new_status
+      self.deal_user = deal_user
+
       self.active_since = at if active?
+    end
+
+    # 成交、过期时排队结束，返回还在排队的人（不含成交对象），由调用方通知
+    def end_queue(at: Time.zone.now)
+      users = raised_hands.queue.includes(:user).map(&:user)
+      raised_hands.active.update_all(ended_at: at, updated_at: at)
+      users - [deal_user]
     end
 
     def expiry_due?(at: Time.zone.now)
@@ -176,6 +202,10 @@ module DiscourseKuuMarket
       end
     end
 
+    def deal_only_when_ended
+      errors.add(:deal_user, :present) if deal_user_id && !closes_replies?
+    end
+
     def photos_are_images
       return if upload_ids.empty?
 
@@ -211,6 +241,7 @@ end
 #  upload_ids         :integer          default([]), not null, is an Array
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  deal_user_id       :integer
 #  topic_id           :integer          not null
 #
 # Indexes

@@ -86,6 +86,12 @@ module DiscourseKuuMarket
             status: :unprocessable_content,
           )
         end
+        on_failed_policy(:deal_user_in_queue) do
+          render(
+            json: failed_json.merge(errors: [I18n.t("kuu_market.errors.deal_user_not_in_queue")]),
+            status: :unprocessable_content,
+          )
+        end
       end
     end
 
