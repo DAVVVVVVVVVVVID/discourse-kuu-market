@@ -25,9 +25,10 @@ RSpec.describe "Choosing who a listing was sold to" do
     Jobs.run_immediately!
   end
 
+  # 卖家已经在举手提醒弹窗里看过这些人，不然打开页面会先弹提醒
   def raise_hands
-    listing.raised_hands.create!(user: other, created_at: 2.hours.ago)
-    listing.raised_hands.create!(user: buyer, created_at: 1.hour.ago)
+    listing.raised_hands.create!(user: other, created_at: 2.hours.ago, alerted_at: 1.hour.ago)
+    listing.raised_hands.create!(user: buyer, created_at: 1.hour.ago, alerted_at: 1.hour.ago)
   end
 
   def mark_as_sold
