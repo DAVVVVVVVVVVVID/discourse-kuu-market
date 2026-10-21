@@ -5,7 +5,8 @@
 //     node /tmp/screenshot.mjs /c/market/7 /tmp/shot 用户名 密码 "click:#create-topic" "wait:.kuu-market-form"
 //   docker cp discourse_dev:/tmp/shot-desktop.png . （手机版是 shot-mobile.png）
 // 步骤：click:选择器、wait:选择器、fill:选择器::内容、upload:选择器::文件路径。用户名为 - 时不登录。
-// 加 -e FULL_PAGE=1 截整页。只用于本地开发库里的测试账号。
+// 加 -e FULL_PAGE=1 截整页，-e ONLY=desktop 或 -e ONLY=mobile 只截一种（比如只能点一次的操作）。
+// 只用于本地开发库里的测试账号。
 import { chromium, devices } from "/src/node_modules/playwright/index.mjs";
 
 const [path = "/", prefix = "/tmp/shot", username, password, ...steps] =
@@ -72,17 +73,22 @@ async function capture(context, file) {
   }
 }
 
+const only = process.env.ONLY;
 const browser = await chromium.launch({ channel: "chromium" });
 try {
-  await capture(
-    await browser.newContext({ viewport: { width: 1366, height: 900 } }),
-    `${prefix}-desktop.png`
-  );
+  if (only !== "mobile") {
+    await capture(
+      await browser.newContext({ viewport: { width: 1366, height: 900 } }),
+      `${prefix}-desktop.png`
+    );
+  }
   // 手机 User-Agent，Discourse 才会给手机版布局
-  await capture(
-    await browser.newContext({ ...devices["iPhone 13"] }),
-    `${prefix}-mobile.png`
-  );
+  if (only !== "desktop") {
+    await capture(
+      await browser.newContext({ ...devices["iPhone 13"] }),
+      `${prefix}-mobile.png`
+    );
+  }
 } finally {
   await browser.close();
 }

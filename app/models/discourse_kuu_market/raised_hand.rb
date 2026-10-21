@@ -28,10 +28,12 @@ module DiscourseKuuMarket
     end
 
     # 弹窗内容：每个帖子一项（话题 id、类型、商品名、新举手人数），up_to_id 是这批里最大的记录 id，
-    # 关掉弹窗时只标记到这里，弹窗打开以后才举手的人下次再弹
+    # 关掉弹窗时只标记到这里，弹窗打开以后才举手的人下次再弹。这批只有一个人举手时带上和他的
+    # 私聊频道，「去私信」直接打开那个对话（Issue #9）
     def self.alerts_for(user)
+      hands = unalerted_for(user)
       rows =
-        unalerted_for(user)
+        hands
           .group(
             "kuu_market_listings.topic_id",
             "kuu_market_listings.kind",
@@ -47,12 +49,19 @@ module DiscourseKuuMarket
           )
       return if rows.empty?
 
+      raiser_ids = hands.distinct.pluck(:user_id)
+      chat_channel_id =
+        if raiser_ids.size == 1
+          DiscourseKuuMarket.direct_message_channel_id(user, User.find(raiser_ids.first))
+        end
+
       {
         listings:
           rows.map do |topic_id, kind, item_name, count, _|
             { topic_id:, kind:, item_name:, count: }
           end,
         up_to_id: rows.map(&:last).max,
+        chat_channel_id:,
       }
     end
 

@@ -5,10 +5,13 @@ import Category from "discourse/models/category";
 import { i18n } from "discourse-i18n";
 import ListingPanel from "../components/kuu-market/listing-panel";
 import ListingTopicLink from "../components/kuu-market/listing-topic-link";
-import HandAlert from "../components/kuu-market/modal/hand-alert";
 import ListingForm from "../components/kuu-market/modal/listing-form";
 import TopicTitlePrefix from "../components/kuu-market/topic-title-prefix";
-import { marketCategoryId } from "../lib/kuu-market";
+import {
+  handAlertMessage,
+  marketCategoryId,
+  openDirectMessages,
+} from "../lib/kuu-market";
 
 // 作者收到的「你的帖子过期了」和举手人收到的「举手的帖子过期了」
 const EXPIRY_MESSAGES = {
@@ -26,6 +29,8 @@ export default {
     }
 
     const modal = container.lookup("service:modal");
+    const dialog = container.lookup("service:dialog");
+    const router = container.lookup("service:router");
 
     // 「新建话题」按钮由 discourse-kuu-new-topic 统一处理：在二手市场分类里直接打开表单，
     // 其他地方出现在选择框里（2026-10-19 David 定）。不管从哪里打开，帖子都发到二手市场分类。
@@ -57,7 +62,16 @@ export default {
           }
           shown = true;
 
-          await modal.show(HandAlert, { model: alerts });
+          // 和「取消举手」确认框一样的居中弹窗（Issue #9）。「去私信」「继续浏览」、点外面关掉，
+          // 都算看过这批
+          await dialog.confirm({
+            class: "kuu-market-hand-alert",
+            message: handAlertMessage(alerts),
+            confirmButtonLabel: "kuu_market.hands.open_chat",
+            cancelButtonLabel: "kuu_market.hands.keep_browsing",
+            didConfirm: () =>
+              openDirectMessages(router, alerts.chat_channel_id),
+          });
           currentUser.set("kuu_market_hand_alerts", null);
           await ajax("/kuu-market/hand-alerts/dismiss.json", {
             type: "PUT",

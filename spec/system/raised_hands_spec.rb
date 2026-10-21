@@ -42,7 +42,13 @@ RSpec.describe "Raising a hand on a listing" do
 
     find(".kuu-market-hands__raise").click
 
-    expect(toasts).to have_success(I18n.t("js.kuu_market.hands.sent.raised.sell"))
+    expect(dialog).to have_content(I18n.t("js.kuu_market.hands.sent.raised.sell"))
+    expect(page).to have_css(
+      ".kuu-market-hand-dialog .dialog-footer .btn-primary",
+      text: I18n.t("js.kuu_market.hands.open_chat"),
+    )
+    dialog.click_no
+    expect(dialog).to be_closed
     expect(page).to have_css(".kuu-market-hands__raised")
     expect(page).to have_css(queue_avatar(buyer))
     expect(direct_messages.map(&:user)).to eq([buyer])
@@ -56,14 +62,45 @@ RSpec.describe "Raising a hand on a listing" do
     expect(direct_messages.size).to eq(2)
   end
 
-  it "says so when the seller does not accept direct messages" do
+  it "opens the conversation with the seller from the dialog" do
+    sign_in(buyer)
+    topic_page.visit_topic(listing.topic)
+
+    find(".kuu-market-hands__raise").click
+    dialog.click_yes
+
+    channel = Chat::DirectMessage.for_user_ids([seller.id, buyer.id]).direct_message_channel
+    # 电脑上聊天在右下角的抽屉里打开
+    expect(page).to have_css(".chat-drawer-container .chat-channel[data-id='#{channel.id}']")
+  end
+
+  it "opens the conversation full screen on phones", mobile: true do
+    sign_in(buyer)
+    topic_page.visit_topic(listing.topic)
+
+    find(".kuu-market-hands__raise").click
+    dialog.click_yes
+
+    channel = Chat::DirectMessage.for_user_ids([seller.id, buyer.id]).direct_message_channel
+    expect(page).to have_current_path(%r{\A/chat/c/[^/]+/#{channel.id}})
+    expect(page).to have_css(".chat-channel[data-id='#{channel.id}']")
+  end
+
+  it "says so when the seller does not accept direct messages, without offering to open them" do
     seller.user_option.update!(allow_private_messages: false)
     sign_in(buyer)
     topic_page.visit_topic(listing.topic)
 
     find(".kuu-market-hands__raise").click
 
-    expect(toasts).to have_warning(I18n.t("js.kuu_market.hands.poster_unavailable.raised.sell"))
+    expect(dialog).to have_content(I18n.t("js.kuu_market.hands.poster_unavailable.raised.sell"))
+    expect(page).to have_css(".kuu-market-hand-dialog .dialog-footer .btn", count: 1)
+    expect(page).to have_css(
+      ".kuu-market-hand-dialog .dialog-footer .btn",
+      text: I18n.t("js.kuu_market.hands.keep_browsing"),
+    )
+    dialog.click_ok
+    expect(dialog).to be_closed
     expect(page).to have_css(queue_avatar(buyer))
   end
 
