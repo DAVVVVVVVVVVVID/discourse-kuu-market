@@ -169,6 +169,16 @@ en:
         empty: "You haven't posted any listings yet"
         post: "Post a listing"
         none_in_tab: "Nothing here yet"
+      hand_chats:
+        label: "Hands:"
+        nobody: "Nobody has raised their hand yet"
+        title:
+          sell: "People who want “%{item}”"
+          buy: "People who can offer “%{item}”"
+        raised_at: "Raised %{time}"
+        no_messages: "No messages yet"
+        mine: "You: %{excerpt}"
+        unread: "Unread messages"
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"

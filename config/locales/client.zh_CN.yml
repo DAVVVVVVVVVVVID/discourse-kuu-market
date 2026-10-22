@@ -166,6 +166,17 @@ zh_CN:
         empty: "你还没有发过二手帖"
         post: "发布二手帖"
         none_in_tab: "这里还没有帖子"
+      # 「我的商品」卡片下的举手人和「去私信」弹窗（Issue #15，2026-10-22 David 定）
+      hand_chats:
+        label: "举手："
+        nobody: "还没有人举手"
+        title:
+          sell: "想要『%{item}』的同学"
+          buy: "能提供『%{item}』的同学"
+        raised_at: "%{time}举手"
+        no_messages: "还没有私聊"
+        mine: "我：%{excerpt}"
+        unread: "未读消息"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"
