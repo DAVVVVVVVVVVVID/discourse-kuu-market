@@ -15,6 +15,7 @@ register_svg_icon "clock-rotate-left"
 register_svg_icon "cart-shopping"
 register_svg_icon "magnifying-glass"
 register_svg_icon "hand"
+register_svg_icon "arrow-right"
 
 module ::DiscourseKuuMarket
   PLUGIN_NAME = "discourse-kuu-market"

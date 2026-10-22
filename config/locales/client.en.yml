@@ -157,6 +157,18 @@ en:
             one: "%{count} person can offer the “%{item}” you're looking for"
             other: "%{count} people can offer the “%{item}” you're looking for"
         hint: "Check your direct messages!"
+      my_listings:
+        title: "My listings"
+        tabs:
+          active: "In progress"
+          dealt: "Done"
+          expired: "Expired"
+        posted_on: "Posted %{date}"
+        expired_on: "Expired %{date}"
+        open: "Open"
+        empty: "You haven't posted any listings yet"
+        post: "Post a listing"
+        none_in_tab: "Nothing here yet"
       notifications:
         expired_sell: "Expired: relist it or mark it as sold"
         expired_buy: "Expired: keep looking or mark it as closed"

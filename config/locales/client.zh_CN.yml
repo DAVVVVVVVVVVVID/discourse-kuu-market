@@ -153,6 +153,19 @@ zh_CN:
           sell: "有 %{count} 位同学想要购买你出售的『%{item}』"
           buy: "有 %{count} 位同学想要提供你求购的『%{item}』"
         hint: "快去私信查收吧~"
+      # 「我的商品」页（Issue #12，2026-10-22）
+      my_listings:
+        title: "我的商品"
+        tabs:
+          active: "进行中"
+          dealt: "已成交"
+          expired: "已过期"
+        posted_on: "%{date} 发布"
+        expired_on: "%{date} 已过期"
+        open: "打开帖子"
+        empty: "你还没有发过二手帖"
+        post: "发布二手帖"
+        none_in_tab: "这里还没有帖子"
       notifications:
         expired_sell: "已过期，可以重新上架或标记已出"
         expired_buy: "已过期，可以继续求购或标记结束"

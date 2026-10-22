@@ -62,6 +62,17 @@ export default {
       });
       api.renderInOutlet("discovery-list-container-top", MarketFilters);
 
+      // 点头像后菜单里「个人资料」那一栏的「我的商品」（Issue #12）
+      const user = api.getCurrentUser();
+      if (user) {
+        api.addQuickAccessProfileItem({
+          icon: "cart-shopping",
+          href: `/u/${user.username_lower}/market`,
+          content: i18n("kuu_market.my_listings.title"),
+          className: "kuu-market-my-listings-link",
+        });
+      }
+
       // 有新的人举手时，发帖人打开论坛后弹窗提醒一次（Issue #5 第二期）。等第一个页面渲染好再弹；
       // 关掉以后告诉后端这批看过了，弹窗打开以后才举手的人下次再弹
       const currentUser = api.getCurrentUser();
