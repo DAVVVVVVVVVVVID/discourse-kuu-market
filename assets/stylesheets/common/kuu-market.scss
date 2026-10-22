@@ -517,13 +517,62 @@ html.mobile-view
   }
 
   &__item {
-    display: grid;
-    grid-template-columns: 5.5rem 1fr;
-    gap: var(--space-3);
     padding: var(--space-3);
     border: 1px solid var(--primary-low);
     border-radius: 8px;
     background: var(--secondary);
+  }
+
+  &__card {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: var(--space-3);
+  }
+
+  // 卡片下面一行：正在排队的举手人头像和「去私信」（Issue #15）。只占一行
+  &__hands-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--primary-low);
+  }
+
+  &__hands-label {
+    flex: none;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__avatars {
+    display: flex;
+    flex: 0 1 auto;
+    gap: var(--space-1);
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__avatar {
+    display: flex;
+    flex: none;
+  }
+
+  &__more {
+    flex: none;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  .btn.kuu-market-my-listings__chats {
+    flex: none;
+    margin-left: auto;
+  }
+
+  &__no-hands {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
   }
 
   &__image {
@@ -597,5 +646,79 @@ html.mobile-view
 
   &__none {
     color: var(--primary-medium);
+  }
+}
+
+// 「去私信」弹窗：这件商品举手人的私聊列表（Issue #15）
+.kuu-market-hand-chats {
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    width: 100%;
+    padding: var(--space-2) var(--space-1);
+    border: 0;
+    border-bottom: 1px solid var(--primary-low);
+    background: none;
+    color: var(--primary);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--primary-very-low);
+    }
+
+    &.--unread .kuu-market-hand-chats__preview {
+      color: var(--primary);
+      font-weight: 600;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.15em;
+    min-width: 0;
+  }
+
+  &__head {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+
+  &__name {
+    font-weight: 600;
+  }
+
+  &__time {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__preview {
+    overflow: hidden;
+    color: var(--primary-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__unread {
+    flex: none;
+    min-width: 1.4em;
+    padding: 0 0.4em;
+    border-radius: 999px;
+    background: var(--tertiary);
+    color: var(--secondary);
+    font-size: var(--font-down-1);
+    line-height: 1.4;
+    text-align: center;
   }
 }

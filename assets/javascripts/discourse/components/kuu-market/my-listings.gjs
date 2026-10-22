@@ -9,6 +9,7 @@ import DEmptyState from "discourse/ui-kit/d-empty-state";
 import { i18n } from "discourse-i18n";
 import ListingActions from "./listing-actions";
 import ListingForm from "./modal/listing-form";
+import MyListingHands from "./my-listing-hands";
 
 const GROUPS = [
   { key: "active", statuses: ["selling", "buying"] },
@@ -121,51 +122,54 @@ export default class MyListings extends Component {
                 class="kuu-market-my-listings__item"
                 data-topic-id={{item.listing.topic_id}}
               >
-                <a
-                  class="kuu-market-my-listings__image"
-                  href={{item.listing.url}}
-                >
-                  {{#if item.imageUrl}}
-                    <img alt="" loading="lazy" src={{item.imageUrl}} />
-                  {{/if}}
-                </a>
-                <div class="kuu-market-my-listings__body">
+                <div class="kuu-market-my-listings__card">
                   <a
-                    class="kuu-market-my-listings__name"
+                    class="kuu-market-my-listings__image"
                     href={{item.listing.url}}
-                  >{{item.listing.item_name}}</a>
-                  <div class="kuu-market-my-listings__meta">
-                    <span
-                      class="kuu-market-card__price
-                        {{if item.listing.free '--free'}}"
-                    >{{item.listing.card_price}}</span>
-                    <span
-                      class="kuu-market-card__status kuu-market-status-{{item.listing.status}}"
-                    >{{item.statusLabel}}</span>
-                    {{#if item.handsLabel}}
-                      <span
-                        class="kuu-market-my-listings__hands"
-                      >{{item.handsLabel}}</span>
-                    {{/if}}
-                  </div>
-                  <div class="kuu-market-my-listings__dates">
-                    <span>{{item.postedOn}}</span>
-                    {{#if item.endsOn}}
-                      <span>{{item.endsOn}}</span>
-                    {{/if}}
-                  </div>
-                  <ListingActions
-                    class="kuu-market-my-listings__actions"
-                    @listing={{item.listing}}
                   >
-                    <DButton
-                      class="btn-flat kuu-market-my-listings__open"
-                      @href={{item.listing.url}}
-                      @icon="arrow-right"
-                      @label="kuu_market.my_listings.open"
-                    />
-                  </ListingActions>
+                    {{#if item.imageUrl}}
+                      <img alt="" loading="lazy" src={{item.imageUrl}} />
+                    {{/if}}
+                  </a>
+                  <div class="kuu-market-my-listings__body">
+                    <a
+                      class="kuu-market-my-listings__name"
+                      href={{item.listing.url}}
+                    >{{item.listing.item_name}}</a>
+                    <div class="kuu-market-my-listings__meta">
+                      <span
+                        class="kuu-market-card__price
+                          {{if item.listing.free '--free'}}"
+                      >{{item.listing.card_price}}</span>
+                      <span
+                        class="kuu-market-card__status kuu-market-status-{{item.listing.status}}"
+                      >{{item.statusLabel}}</span>
+                      {{#if item.handsLabel}}
+                        <span
+                          class="kuu-market-my-listings__hands"
+                        >{{item.handsLabel}}</span>
+                      {{/if}}
+                    </div>
+                    <div class="kuu-market-my-listings__dates">
+                      <span>{{item.postedOn}}</span>
+                      {{#if item.endsOn}}
+                        <span>{{item.endsOn}}</span>
+                      {{/if}}
+                    </div>
+                    <ListingActions
+                      class="kuu-market-my-listings__actions"
+                      @listing={{item.listing}}
+                    >
+                      <DButton
+                        class="btn-flat kuu-market-my-listings__open"
+                        @href={{item.listing.url}}
+                        @icon="arrow-right"
+                        @label="kuu_market.my_listings.open"
+                      />
+                    </ListingActions>
+                  </div>
                 </div>
+                <MyListingHands @listing={{item.listing}} />
               </li>
             {{/each}}
           </ul>

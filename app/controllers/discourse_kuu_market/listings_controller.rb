@@ -107,6 +107,22 @@ module DiscourseKuuMarket
       end
     end
 
+    def hand_chats
+      Listing::HandChats.call(service_params) do
+        on_success do |rows:|
+          render json: {
+                   hands:
+                     rows.map do |row|
+                       row.merge(user: BasicUserSerializer.new(row[:user], root: false).as_json)
+                     end,
+                 }
+        end
+        on_failed_contract { raise Discourse::NotFound }
+        on_model_not_found(:listing) { raise Discourse::NotFound }
+        on_failed_policy(:can_manage) { raise Discourse::NotFound }
+      end
+    end
+
     def raise_hand
       Listing::RaiseHand.call(service_params) do
         on_success do |delivery:, listing:, chat_channel_id: nil|

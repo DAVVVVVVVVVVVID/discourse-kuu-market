@@ -6,6 +6,7 @@ DiscourseKuuMarket::Engine.routes.draw do
   put "/listings/:topic_id/status" => "listings#update_status"
   post "/listings/:topic_id/hand" => "listings#raise_hand"
   delete "/listings/:topic_id/hand" => "listings#cancel_hand"
+  get "/listings/:topic_id/hand-chats" => "listings#hand_chats"
   put "/hand-alerts/dismiss" => "hand_alerts#dismiss"
   get "/users/:username/listings" => "listings#for_user",
       :constraints => {
