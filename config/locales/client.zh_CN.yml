@@ -12,6 +12,29 @@ zh_CN:
       kinds:
         sell: "出售"
         buy: "求购"
+      # 位置范围和商品分类（Issue #11，2026-10-22 David 定）。area_short 用在卡片和筛选上
+      areas:
+        yoshida: "吉田校区"
+        uji: "宇治校区"
+        katsura: "桂校区"
+        other: "其他"
+      area_short:
+        yoshida: "吉田"
+        uji: "宇治"
+        katsura: "桂"
+        other: "其他"
+      categories:
+        furniture_appliances: "家具家电"
+        electronics: "数码与电子产品"
+        clothing: "服饰"
+        transport_sports: "交通与运动"
+        entertainment: "娱乐"
+        study: "教材与学习"
+        other: "其他"
+      filters:
+        all: "全部"
+        area: "校区"
+        category: "分类"
       trade_methods:
         pickup: "自取"
         delivery: "可送"
@@ -29,6 +52,9 @@ zh_CN:
         budget_max: "最高预算（日元）"
         location: "交易地点"
         location_placeholder: "例：吉田本校区、百万遍"
+        area: "位置范围"
+        categories: "商品分类"
+        categories_hint: "最多选 %{count} 个"
         trade_method: "交易方式"
         description: "补充说明"
         privacy_hint: "不要填手机号、详细住址，请用私信联系"
@@ -49,6 +75,7 @@ zh_CN:
           budget_required: "最低、最高预算至少填一个"
           budget_order: "最高预算不能低于最低预算"
           too_many_photos: "最多 %{count} 张"
+          too_many_categories: "最多选 %{count} 个"
       # 列表卡片上的状态比帖子页短一点（2026-10-20 David 定：求购中 → 求购）
       # closed 是求购帖成交（2026-10-21 David 定：「结束」改成「已购买」，Issue #5 第三期）
       card_statuses:

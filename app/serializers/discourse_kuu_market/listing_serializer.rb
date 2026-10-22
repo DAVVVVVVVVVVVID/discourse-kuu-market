@@ -11,6 +11,8 @@ module DiscourseKuuMarket
                :budget_min,
                :budget_max,
                :location,
+               :area,
+               :categories,
                :trade_method,
                :description,
                :upload_ids,

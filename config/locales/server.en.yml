@@ -48,6 +48,22 @@ en:
         budget: "Budget"
         location: "Meeting place"
         trade_method: "Handover"
+        area: "Campus"
+        categories: "Categories"
+      areas:
+        yoshida: "Yoshida"
+        uji: "Uji"
+        katsura: "Katsura"
+        other: "Other"
+      categories:
+        furniture_appliances: "Furniture & appliances"
+        electronics: "Electronics"
+        clothing: "Clothing"
+        transport_sports: "Transport & sports"
+        entertainment: "Entertainment"
+        study: "Textbooks & study"
+        other: "Other"
+      separator: ", "
       trade_methods:
         pickup: "Pick up"
         delivery: "Can deliver"

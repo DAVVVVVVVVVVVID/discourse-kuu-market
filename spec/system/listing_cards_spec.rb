@@ -28,6 +28,8 @@ RSpec.describe "Listings shown as product cards in topic lists" do
         params: {
           kind: "sell",
           location: "吉田本校区",
+          area: "yoshida",
+          categories: ["furniture_appliances"],
           trade_method: "pickup",
           upload_ids: [photo.id],
           **params,

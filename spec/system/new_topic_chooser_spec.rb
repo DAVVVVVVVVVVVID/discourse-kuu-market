@@ -25,6 +25,7 @@ RSpec.describe "Choosing a listing from the new topic chooser" do
     expect(listing_form).to be_open
 
     listing_form.fill_in("item_name", "IKEA desk").fill_in("price", "3000")
+    listing_form.pick_categories("furniture_appliances")
     listing_form.upload_photo(photo)
     listing_form.submit
 

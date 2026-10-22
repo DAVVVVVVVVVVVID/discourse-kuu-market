@@ -227,6 +227,12 @@ RSpec.describe DiscourseKuuMarket::Listing::ChangeStatus do
       end
     end
 
+    context "when the listing was posted before campuses and categories existed" do
+      before { listing.update_columns(area: nil, categories: []) }
+
+      it { is_expected.to run_successfully }
+    end
+
     context "with people in the queue" do
       fab!(:first_in_line, :user)
       fab!(:second_in_line, :user)

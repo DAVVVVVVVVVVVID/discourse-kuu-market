@@ -10,6 +10,19 @@ export const BUY_MAX_PHOTOS = 1;
 
 export const TRADE_METHODS = ["pickup", "delivery", "negotiable"];
 
+// 位置范围和商品分类（Issue #11），和后端 Listing::AREAS / CATEGORIES 一致
+export const LISTING_AREAS = ["yoshida", "uji", "katsura", "other"];
+export const LISTING_CATEGORIES = [
+  "furniture_appliances",
+  "electronics",
+  "clothing",
+  "transport_sports",
+  "entertainment",
+  "study",
+  "other",
+];
+export const MAX_LISTING_CATEGORIES = 3;
+
 // 发帖人的举手提醒：每个帖子一行，最后一句「快去私信查收吧~」。dialog 把 message 当 HTML 输出，
 // 商品名是用户填的，要先转义
 export function handAlertMessage({ listings }) {
@@ -50,6 +63,9 @@ export function formDataFor(listing, siteSettings) {
       budget_min: null,
       budget_max: null,
       location: siteSettings.kuu_market_default_location ?? "",
+      // 和交易地点默认的「吉田本校区」一致
+      area: "yoshida",
+      categories: [],
       trade_method: "pickup",
       description: "",
       photos: [],
@@ -64,6 +80,9 @@ export function formDataFor(listing, siteSettings) {
     budget_min: listing.budget_min,
     budget_max: listing.budget_max,
     location: listing.location,
+    // 上线前发的帖子没有这两项，修改时要补填
+    area: listing.area ?? null,
+    categories: listing.categories ?? [],
     trade_method: listing.trade_method ?? "pickup",
     description: listing.description,
     photos: listing.photos ?? [],
@@ -75,6 +94,8 @@ export function payloadFrom(data) {
     kind: data.kind,
     item_name: data.item_name?.trim(),
     location: data.location?.trim(),
+    area: data.area,
+    categories: data.categories,
     description: data.description ?? "",
     upload_ids: data.photos.map((photo) => photo.id),
   };

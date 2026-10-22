@@ -276,6 +276,21 @@
     }
   }
 
+  // 图片左下角的校区小字（Issue #11），压在照片上，不占文字区
+  .kuu-market-card__area {
+    position: absolute;
+    left: 0.3em;
+    bottom: 0.3em;
+    padding: 0.1em 0.45em;
+    border-radius: 4px;
+    background: rgb(10 45 86 / 0.75);
+    color: #fff;
+
+    // 图片框为了显示图标字号很大，这里用固定字号，不跟着它放大
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
   .kuu-market-card__body {
     display: flex;
     flex-direction: column;
@@ -395,5 +410,68 @@ html.mobile-view
     display: inline-flex;
     gap: var(--space-2);
     align-items: center;
+  }
+}
+
+// 二手市场页的筛选（Issue #11）：两排可点的标签，手机上横向滑动
+.kuu-market-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+
+  &__row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__label {
+    flex: none;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__options {
+    display: flex;
+    gap: var(--space-1);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .btn.kuu-market-filters__option {
+    flex: none;
+    padding: var(--space-1) var(--space-3);
+    border-radius: 999px;
+    color: var(--primary-high);
+    font-size: var(--font-down-1);
+    white-space: nowrap;
+
+    &.--selected {
+      background: #0a2d56;
+      color: #fff;
+    }
+  }
+}
+
+// 表单里的商品分类标签
+.kuu-market-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+
+  .btn.kuu-market-chips__chip {
+    border-radius: 999px;
+
+    &.--selected {
+      background: #0a2d56;
+      color: #fff;
+    }
   }
 }

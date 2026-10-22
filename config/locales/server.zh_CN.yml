@@ -48,6 +48,22 @@ zh_CN:
         budget: "预算"
         location: "交易地点"
         trade_method: "交易方式"
+        area: "位置范围"
+        categories: "商品分类"
+      areas:
+        yoshida: "吉田校区"
+        uji: "宇治校区"
+        katsura: "桂校区"
+        other: "其他"
+      categories:
+        furniture_appliances: "家具家电"
+        electronics: "数码与电子产品"
+        clothing: "服饰"
+        transport_sports: "交通与运动"
+        entertainment: "娱乐"
+        study: "教材与学习"
+        other: "其他"
+      separator: "、"
       trade_methods:
         pickup: "自取"
         delivery: "可送"

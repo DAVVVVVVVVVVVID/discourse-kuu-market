@@ -11,6 +11,8 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
       item_name: "宜家书桌",
       price: 3000,
       location: "吉田本校区",
+      area: "yoshida",
+      categories: ["furniture_appliances"],
       trade_method: "pickup",
       description: "九成新",
       upload_ids: [photo.id],
@@ -70,6 +72,8 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
                item_name: "自行车",
                budget_max: 10_000,
                location: "桂校区",
+               area: "yoshida",
+               categories: ["furniture_appliances"],
              }
 
         expect(response.status).to eq(200)
@@ -84,6 +88,8 @@ RSpec.describe DiscourseKuuMarket::ListingsController do
           item_name: "伞",
           free: true,
           location: "吉田本校区",
+          area: "yoshida",
+          categories: ["furniture_appliances"],
           trade_method: "pickup",
           upload_ids: [photo.id],
         }

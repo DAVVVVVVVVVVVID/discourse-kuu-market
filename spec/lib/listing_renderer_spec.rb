@@ -192,6 +192,8 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
           :kuu_market_listing,
           price: 3000,
           location: "吉田本校区",
+          area: "yoshida",
+          categories: %w[furniture_appliances study],
           trade_method: "pickup",
           description: "九成新，用了一年。\n\n周末可以看货。",
           upload_ids: [photo.id],
@@ -203,8 +205,10 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
           ![|800x600](#{photo.short_url})
 
           - **价格**：¥3,000
+          - **位置范围**：吉田校区
           - **交易地点**：吉田本校区
           - **交易方式**：自取
+          - **商品分类**：家具家电、教材与学习
 
           九成新，用了一年。
 
@@ -244,15 +248,27 @@ RSpec.describe DiscourseKuuMarket::ListingRenderer do
           budget_min: nil,
           budget_max: 10_000,
           location: "桂校区",
+          area: "katsura",
           description: "",
         )
       end
 
-      it "only lists the budget and the place" do
+      it "only lists the budget, the place and the category" do
         expect(renderer.raw).to eq(<<~MD.strip)
           - **预算**：¥10,000 以内
+          - **位置范围**：桂校区
           - **交易地点**：桂校区
+          - **商品分类**：交通与运动
         MD
+      end
+    end
+
+    context "when the listing was posted before campuses and categories existed" do
+      let(:listing) { Fabricate.build(:kuu_market_listing, area: nil, categories: []) }
+
+      it "leaves them out" do
+        expect(renderer.raw).not_to include("位置范围")
+        expect(renderer.raw).not_to include("商品分类")
       end
     end
 

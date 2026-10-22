@@ -26,6 +26,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Update do
             item_name: "宜家书桌",
             price: 3000,
             location: "吉田本校区",
+            area: "yoshida",
+            categories: ["furniture_appliances"],
             trade_method: "pickup",
             description: "九成新",
             upload_ids: [photo.id],
@@ -44,6 +46,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Update do
         item_name: "宜家书桌",
         price: 2000,
         location: "吉田本校区",
+        area: "yoshida",
+        categories: ["furniture_appliances"],
         trade_method: "delivery",
         description:,
         upload_ids:,
@@ -180,6 +184,25 @@ RSpec.describe DiscourseKuuMarket::Listing::Update do
 
       it "regenerates the title" do
         expect { result }.to change { topic.reload.title }.to("【出售】宜家书桌 · ¥2,000")
+      end
+    end
+
+    context "when the listing was posted before campuses and categories existed" do
+      before { listing.update_columns(area: nil, categories: []) }
+
+      context "when the form leaves them out" do
+        let(:params) { super().except(:area, :categories) }
+
+        it { is_expected.to fail_a_contract }
+      end
+
+      context "when the form fills them in" do
+        let(:params) { super().merge(area: "uji", categories: %w[electronics study]) }
+
+        it "saves them" do
+          expect { result }.to change { listing.reload.area }.from(nil).to("uji")
+          expect(listing.categories).to eq(%w[electronics study])
+        end
       end
     end
 

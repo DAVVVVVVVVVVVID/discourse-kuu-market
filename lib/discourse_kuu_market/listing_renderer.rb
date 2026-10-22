@@ -98,8 +98,12 @@ module DiscourseKuuMarket
         else
           { price: @listing.free ? t("free") : yen(@listing.price) }
         end
+      fields[:area] = t("areas.#{@listing.area}") if @listing.area
       fields[:location] = escape(@listing.location)
       fields[:trade_method] = t("trade_methods.#{@listing.trade_method}") if @listing.sell?
+      if @listing.categories.any?
+        fields[:categories] = @listing.categories.map { t("categories.#{it}") }.join(t("separator"))
+      end
 
       fields.map { |name, value| t("field_line", label: t("fields.#{name}"), value:) }.join("\n")
     end
