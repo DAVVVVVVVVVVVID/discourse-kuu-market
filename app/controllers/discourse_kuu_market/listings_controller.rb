@@ -95,6 +95,18 @@ module DiscourseKuuMarket
       end
     end
 
+    def for_user
+      Listing::ListForUser.call(service_params) do
+        on_success do |listings:|
+          render json: { listings: serialize_data(listings, MyListingSerializer, root: false) }
+        end
+        on_failed_contract { raise Discourse::NotFound }
+        on_model_not_found(:user) { raise Discourse::NotFound }
+        # 别人的「我的商品」当作不存在
+        on_failed_policy(:can_see_listings) { raise Discourse::NotFound }
+      end
+    end
+
     def raise_hand
       Listing::RaiseHand.call(service_params) do
         on_success do |delivery:, listing:, chat_channel_id: nil|
