@@ -23,6 +23,20 @@ module PageObjects
         self
       end
 
+      def choose_area(area)
+        field("area").select(area)
+        self
+      end
+
+      def category_chip(key)
+        find("#{MODAL_SELECTOR} .kuu-market-chips__chip[data-category='#{key}']")
+      end
+
+      def pick_categories(*keys)
+        keys.each { category_chip(it).click }
+        self
+      end
+
       def fill_in(name, value)
         field(name).fill_in(value)
         self

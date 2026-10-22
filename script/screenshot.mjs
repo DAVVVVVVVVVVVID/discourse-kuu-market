@@ -4,7 +4,7 @@
 //   docker exec -u discourse -e HOME=/home/discourse discourse_dev \
 //     node /tmp/screenshot.mjs /c/market/7 /tmp/shot 用户名 密码 "click:#create-topic" "wait:.kuu-market-form"
 //   docker cp discourse_dev:/tmp/shot-desktop.png . （手机版是 shot-mobile.png）
-// 步骤：click:选择器、wait:选择器、fill:选择器::内容、upload:选择器::文件路径。用户名为 - 时不登录。
+// 步骤：click:选择器、wait:选择器、scroll:选择器、fill:选择器::内容、upload:选择器::文件路径。用户名为 - 时不登录。
 // 加 -e FULL_PAGE=1 截整页，-e ONLY=desktop 或 -e ONLY=mobile 只截一种（比如只能点一次的操作）。
 // 只用于本地开发库里的测试账号。
 import { chromium, devices } from "/src/node_modules/playwright/index.mjs";
@@ -42,6 +42,9 @@ async function runStep(page, step) {
       break;
     case "fill":
       await page.fill(selector, value);
+      break;
+    case "scroll":
+      await page.locator(argument).first().scrollIntoViewIfNeeded();
       break;
     case "upload":
       await page.setInputFiles(selector, value);

@@ -19,6 +19,12 @@ export default class ListingTopicLink extends Component {
     return this.topic.kuu_market_card;
   }
 
+  // 卡片图片左下角的校区小字（Issue #11）；上线前发的帖子没有
+  get areaLabel() {
+    const area = this.card.area;
+    return area ? i18n(`kuu_market.area_short.${area}`) : null;
+  }
+
   get isBuy() {
     return this.topic.kuu_market_kind === "buy";
   }
@@ -74,6 +80,9 @@ export default class ListingTopicLink extends Component {
             <img alt="" decoding="async" loading="lazy" src={{this.imageUrl}} />
           {{else}}
             {{dIcon (if this.isBuy "magnifying-glass" "cart-shopping")}}
+          {{/if}}
+          {{#if this.areaLabel}}
+            <span class="kuu-market-card__area">{{this.areaLabel}}</span>
           {{/if}}
         </span>
         <span class="kuu-market-card__body">

@@ -14,17 +14,31 @@ module DiscourseKuuMarket
       attribute :budget_min, :integer
       attribute :budget_max, :integer
       attribute :location, :string
+      attribute :area, :string
+      attribute :categories, :array, compact_blank: true, default: []
       attribute :trade_method, :string
       attribute :description, :string, default: ""
       attribute :upload_ids, :array, compact_blank: true, default: []
 
       validates :kind, inclusion: { in: Listing.kinds.keys }
+      # 修改时也检查：上线前发的帖子没有这两项，作者下次修改时要补填
+      validates :area, inclusion: { in: Listing::AREAS }
+      validates :categories, length: { minimum: 1, maximum: Listing::MAX_CATEGORIES }
+      validate :categories_allowed
+
+      def categories_allowed
+        if categories.uniq.size != categories.size || (categories - Listing::CATEGORIES).any?
+          errors.add(:categories, :inclusion)
+        end
+      end
 
       def listing_attributes
         common = {
           kind:,
           item_name: item_name&.strip,
           location: location&.strip,
+          area:,
+          categories:,
           description: description.to_s.strip,
           upload_ids:,
         }

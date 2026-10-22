@@ -12,6 +12,28 @@ en:
       kinds:
         sell: "Sell"
         buy: "Buy"
+      areas:
+        yoshida: "Yoshida campus"
+        uji: "Uji campus"
+        katsura: "Katsura campus"
+        other: "Other"
+      area_short:
+        yoshida: "Yoshida"
+        uji: "Uji"
+        katsura: "Katsura"
+        other: "Other"
+      categories:
+        furniture_appliances: "Furniture & appliances"
+        electronics: "Electronics"
+        clothing: "Clothing"
+        transport_sports: "Transport & sports"
+        entertainment: "Entertainment"
+        study: "Textbooks & study"
+        other: "Other"
+      filters:
+        all: "All"
+        area: "Campus"
+        category: "Category"
       trade_methods:
         pickup: "Pick up"
         delivery: "Can deliver"
@@ -29,6 +51,11 @@ en:
         budget_max: "Maximum budget (yen)"
         location: "Meeting place"
         location_placeholder: "e.g. Yoshida campus, Hyakumanben"
+        area: "Campus"
+        categories: "Categories"
+        categories_hint:
+          one: "Choose up to %{count}"
+          other: "Choose up to %{count}"
         trade_method: "Handover"
         description: "Details"
         privacy_hint: "Don't include phone numbers or home addresses; use private messages"
@@ -49,6 +76,7 @@ en:
           budget_required: "Fill in at least one end of the budget"
           budget_order: "The maximum cannot be lower than the minimum"
           too_many_photos: "Up to %{count}"
+          too_many_categories: "Choose up to %{count}"
       card_statuses:
         selling: "For sale"
         sold: "Sold"

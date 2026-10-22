@@ -3,6 +3,13 @@
 RSpec.describe DiscourseKuuMarket::Listing::Create do
   describe described_class::Contract, type: :model do
     it { is_expected.to validate_inclusion_of(:kind).in_array(%w[sell buy]) }
+    it { is_expected.to validate_inclusion_of(:area).in_array(%w[yoshida uji katsura other]) }
+    it { is_expected.not_to allow_value(nil).for(:area) }
+    it { is_expected.not_to allow_value([]).for(:categories) }
+    it { is_expected.to allow_value(%w[electronics study other]).for(:categories) }
+    it { is_expected.not_to allow_value(%w[electronics study other clothing]).for(:categories) }
+    it { is_expected.not_to allow_value(%w[electronics electronics]).for(:categories) }
+    it { is_expected.not_to allow_value(%w[food]).for(:categories) }
 
     describe "#listing_attributes" do
       subject(:listing_attributes) { contract.listing_attributes }
@@ -18,6 +25,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
             budget_min: 100,
             budget_max: 200,
             location: " 吉田本校区 ",
+            area: "yoshida",
+            categories: ["furniture_appliances"],
             trade_method: "pickup",
             description: "  九成新  ",
             upload_ids: [1],
@@ -29,6 +38,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
             kind: "sell",
             item_name: "宜家书桌",
             location: "吉田本校区",
+            area: "yoshida",
+            categories: ["furniture_appliances"],
             description: "九成新",
             upload_ids: [1],
             price: 3000,
@@ -56,6 +67,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
             budget_min: 5000,
             budget_max: 10_000,
             location: "桂校区",
+            area: "yoshida",
+            categories: ["furniture_appliances"],
             trade_method: "pickup",
           }
         end
@@ -65,6 +78,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
             kind: "buy",
             item_name: "自行车",
             location: "桂校区",
+            area: "yoshida",
+            categories: ["furniture_appliances"],
             description: "",
             upload_ids: [],
             budget_min: 5000,
@@ -89,6 +104,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
         price:,
         free:,
         location: "吉田本校区",
+        area: "yoshida",
+        categories: ["furniture_appliances"],
         trade_method: "pickup",
         description:,
         upload_ids: [photo.id],
@@ -196,7 +213,16 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
     end
 
     context "with a buy listing" do
-      let(:params) { { kind: "buy", item_name: "自行车", budget_max: 10_000, location: "桂校区" } }
+      let(:params) do
+        {
+          kind: "buy",
+          item_name: "自行车",
+          budget_max: 10_000,
+          location: "桂校区",
+          area: "katsura",
+          categories: ["transport_sports"],
+        }
+      end
 
       it { is_expected.to run_successfully }
 
@@ -246,6 +272,8 @@ RSpec.describe DiscourseKuuMarket::Listing::Create do
           price: 3000,
           free: false,
           location: "吉田本校区",
+          area: "yoshida",
+          categories: ["furniture_appliances"],
           trade_method: "pickup",
           description: "九成新",
           upload_ids: [photo.id],

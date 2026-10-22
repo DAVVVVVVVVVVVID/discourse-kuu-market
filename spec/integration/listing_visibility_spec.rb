@@ -32,6 +32,8 @@ RSpec.describe "Who sees listings that are no longer in progress" do
           item_name:,
           price: 1000,
           location: "吉田本校区",
+          area: "yoshida",
+          categories: ["furniture_appliances"],
           trade_method: "pickup",
           upload_ids: [photo.id],
         },
@@ -231,6 +233,8 @@ RSpec.describe "Who sees listings that are no longer in progress" do
           "price" => "¥1,000",
           "free" => false,
           "has_photos" => true,
+          "area" => "yoshida",
+          "categories" => ["furniture_appliances"],
         },
       )
       expect(items[sold.id]).to include("kuu_market_status" => "sold")

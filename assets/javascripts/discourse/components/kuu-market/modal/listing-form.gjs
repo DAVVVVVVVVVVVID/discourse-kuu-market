@@ -15,12 +15,15 @@ import {
   DESCRIPTION_MAX_LENGTH,
   formDataFor,
   ITEM_NAME_MAX_LENGTH,
+  LISTING_AREAS,
   LOCATION_MAX_LENGTH,
+  MAX_LISTING_CATEGORIES,
   MAX_YEN,
   maxPhotos,
   payloadFrom,
   TRADE_METHODS,
 } from "../../../lib/kuu-market";
+import CategoryChips from "../category-chips";
 import PhotosInput from "../photos-input";
 
 // 发帖和修改共用。@model.listing 有值时是修改：类型不能改，提交后刷新帖子页
@@ -37,6 +40,8 @@ export default class ListingForm extends Component {
   itemNameValidation = `required:trim|length:1,${ITEM_NAME_MAX_LENGTH}`;
   locationValidation = `required:trim|length:1,${LOCATION_MAX_LENGTH}`;
   priceValidation = `required|integer|between:0,${MAX_YEN}`;
+  areas = LISTING_AREAS;
+  maxCategories = MAX_LISTING_CATEGORIES;
   tradeMethods = TRADE_METHODS;
   yenValidation = `integer|between:0,${MAX_YEN}`;
 
@@ -92,6 +97,17 @@ export default class ListingForm extends Component {
       addError("budget_max", {
         title: i18n("kuu_market.form.budget_max"),
         message: i18n("kuu_market.form.errors.budget_order"),
+      });
+    }
+
+    if (!data.categories?.length) {
+      required("categories", "kuu_market.form.categories");
+    } else if (data.categories.length > MAX_LISTING_CATEGORIES) {
+      addError("categories", {
+        title: i18n("kuu_market.form.categories"),
+        message: i18n("kuu_market.form.errors.too_many_categories", {
+          count: MAX_LISTING_CATEGORIES,
+        }),
       });
     }
 
@@ -250,6 +266,22 @@ export default class ListingForm extends Component {
           {{/if}}
 
           <form.Field
+            @name="area"
+            @title={{i18n "kuu_market.form.area"}}
+            @type="radio-group"
+            @validation="required"
+            as |field|
+          >
+            <field.Control as |radioGroup|>
+              {{#each this.areas as |area|}}
+                <radioGroup.Radio @value={{area}}>
+                  {{i18n (concat "kuu_market.areas." area)}}
+                </radioGroup.Radio>
+              {{/each}}
+            </field.Control>
+          </form.Field>
+
+          <form.Field
             @name="location"
             @title={{i18n "kuu_market.form.location"}}
             @type="input"
@@ -278,6 +310,23 @@ export default class ListingForm extends Component {
               </field.Control>
             </form.Field>
           {{/if}}
+
+          <form.Field
+            @format="full"
+            @helpText={{i18n
+              "kuu_market.form.categories_hint"
+              count=this.maxCategories
+            }}
+            @name="categories"
+            @showOptional={{false}}
+            @title={{i18n "kuu_market.form.categories"}}
+            @type="custom"
+            as |field|
+          >
+            <field.Control>
+              <CategoryChips @onChange={{field.set}} @value={{field.value}} />
+            </field.Control>
+          </form.Field>
 
           <form.Field
             @format="full"

@@ -11,6 +11,19 @@ module DiscourseKuuMarket
     MAX_YEN = 100_000_000
     BUY_MAX_PHOTOS = 1
 
+    # 位置范围和商品分类（Issue #11，2026-10-22 David 定）。固定列表，以后加选项改这里和文案
+    AREAS = %w[yoshida uji katsura other].freeze
+    CATEGORIES = %w[
+      furniture_appliances
+      electronics
+      clothing
+      transport_sports
+      entertainment
+      study
+      other
+    ].freeze
+    MAX_CATEGORIES = 3
+
     ACTIVE_STATUS = { "sell" => "selling", "buy" => "buying" }.freeze
     ENDED_STATUS = { "sell" => "sold", "buy" => "closed" }.freeze
 
@@ -54,6 +67,9 @@ module DiscourseKuuMarket
     validate :sell_fields, if: :sell?
     validate :buy_fields, if: :buy?
     validate :photos_are_images
+    # 必填由表单（Create / Update 的参数）检查：上线前发的帖子没有这两项，切换状态、过期时不能因此失败
+    validates :area, inclusion: { in: AREAS }, allow_nil: true
+    validate :categories_allowed
     validate :deal_only_when_ended
 
     # 新发的帖子从现在开始在售或求购，30 天过期和 7 天顶帖都从现在算
@@ -202,6 +218,13 @@ module DiscourseKuuMarket
       end
     end
 
+    def categories_allowed
+      if categories.size > MAX_CATEGORIES || categories.uniq.size != categories.size ||
+           (categories - CATEGORIES).any?
+        errors.add(:categories, :invalid)
+      end
+    end
+
     def deal_only_when_ended
       errors.add(:deal_user, :present) if deal_user_id && !closes_replies?
     end
@@ -225,8 +248,10 @@ end
 #
 #  id                 :bigint           not null, primary key
 #  active_since       :datetime         not null
+#  area               :string
 #  budget_max         :integer
 #  budget_min         :integer
+#  categories         :string           default([]), not null, is an Array
 #  closed_by_plugin   :boolean          default(FALSE), not null
 #  description        :text             default(""), not null
 #  free               :boolean          default(FALSE), not null
@@ -246,6 +271,8 @@ end
 #
 # Indexes
 #
+#  index_kuu_market_listings_on_area                     (area)
+#  index_kuu_market_listings_on_categories               (categories) USING gin
 #  index_kuu_market_listings_on_status_and_active_since  (status,active_since)
 #  index_kuu_market_listings_on_topic_id                 (topic_id) UNIQUE
 #

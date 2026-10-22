@@ -115,7 +115,34 @@ after_initialize do
       price: DiscourseKuuMarket::ListingRenderer.new(listing).card_price,
       free: listing.sell? && listing.free,
       has_photos: listing.upload_ids.any?,
+      area: listing.area,
+      categories: listing.categories,
     }
+  end
+
+  # 二手市场页按校区、商品分类筛选（Issue #11）：网址里的 kuu_area / kuu_category。
+  # 不认识的值不筛选；上线前发的帖子没有这两项，筛选时不出现
+  TopicQuery.add_custom_filter(:kuu_area) do |results, topic_query|
+    area = topic_query.options[:kuu_area]
+    if !SiteSetting.kuu_market_enabled || DiscourseKuuMarket::Listing::AREAS.exclude?(area)
+      next results
+    end
+
+    results.where("topics.id IN (?)", DiscourseKuuMarket::Listing.where(area:).select(:topic_id))
+  end
+
+  TopicQuery.add_custom_filter(:kuu_category) do |results, topic_query|
+    category = topic_query.options[:kuu_category]
+    if !SiteSetting.kuu_market_enabled || DiscourseKuuMarket::Listing::CATEGORIES.exclude?(category)
+      next results
+    end
+
+    results.where(
+      "topics.id IN (?)",
+      DiscourseKuuMarket::Listing.where("categories @> ARRAY[?]::varchar[]", category).select(
+        :topic_id,
+      ),
+    )
   end
 
   NewPostManager.add_handler(100) { |manager| DiscourseKuuMarket::NewTopicRules.check(manager) }
