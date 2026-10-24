@@ -5,7 +5,7 @@ en:
     kuu_market_expire_days: "Days a listing stays for sale or wanted before it expires automatically."
     kuu_market_bump_interval_days: "Minimum days between bumps to the top of Latest when a listing is relisted. Relisting within this interval still changes the status, without the bump."
     kuu_market_max_photos: "Maximum number of photos on a sell listing."
-    kuu_market_hand_actions_per_day: "Maximum number of hand raises and cancellations (combined) per listing per user per day. Each one sends the author a chat message."
+    kuu_market_hand_actions_per_day: "Maximum number of hand raises and cancellations (combined) per listing per user per day. The count resets at midnight Japan time. Each one sends the author a chat message."
     kuu_market_default_location: "Meeting place prefilled in the listing form. Users can change it."
     kuu_market_placeholder_image: "Image on topic list cards of sell listings without photos (square, at least 400×400)."
     kuu_market_buy_image: "Image on every buy listing's topic list card (square, at least 400×400)."

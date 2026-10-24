@@ -52,12 +52,17 @@ RSpec.describe DiscourseKuuMarket::Listing::CancelHand do
       it { is_expected.to fail_to_find_a_model(:hand) }
     end
 
-    context "when the actor raised or lowered their hand three times in the last day" do
+    context "when the actor raised or lowered their hand three times today" do
+      let(:tokyo) { ActiveSupport::TimeZone["Asia/Tokyo"] }
+
+      # 时间固定在日本时间下午三点，免得测试跑在半夜时跨天（次数按日本时间 0 点清零，Issue #17）
       before do
+        freeze_time(tokyo.parse("2026-10-24 15:00"))
+        hand.update!(created_at: tokyo.parse("2026-10-24 13:00"))
         listing.raised_hands.create!(
           user: actor,
-          created_at: 5.hours.ago,
-          cancelled_at: 4.hours.ago,
+          created_at: tokyo.parse("2026-10-24 10:00"),
+          cancelled_at: tokyo.parse("2026-10-24 11:00"),
         )
       end
 
