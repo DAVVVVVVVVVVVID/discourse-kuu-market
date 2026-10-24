@@ -105,8 +105,10 @@ RSpec.describe "Raising a hand on a listing" do
   end
 
   it "stops a buyer who keeps raising and lowering their hand" do
-    listing.raised_hands.create!(user: buyer, created_at: 2.hours.ago, cancelled_at: 1.hour.ago)
-    listing.raised_hands.create!(user: buyer, created_at: 30.minutes.ago)
+    # 都放在日本时间今天 0 点刚过，免得测试跑在半夜时跨天（次数按日本时间 0 点清零）
+    today = DiscourseKuuMarket::Listing::Policy::WithinDailyHandLimit.day_start + 1.second
+    listing.raised_hands.create!(user: buyer, created_at: today, cancelled_at: today)
+    listing.raised_hands.create!(user: buyer, created_at: today)
     sign_in(buyer)
     topic_page.visit_topic(listing.topic)
 

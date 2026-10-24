@@ -65,7 +65,7 @@ module DiscourseKuuMarket
       }
     end
 
-    # 防刷用：since 之后的举手和取消合计几次
+    # 防刷用：since（日本时间今天 0 点）之后的举手和取消合计几次
     def self.actions_since(listing:, user:, since:)
       hands = where(listing:, user:)
       hands.where("created_at > ?", since).count + hands.where("cancelled_at > ?", since).count

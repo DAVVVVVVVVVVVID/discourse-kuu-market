@@ -86,37 +86,60 @@ RSpec.describe DiscourseKuuMarket::Listing::RaiseHand do
       it { is_expected.to fail_a_policy(:hand_not_raised) }
     end
 
-    context "when the actor raised or lowered their hand three times in the last day" do
-      before do
-        # 举手在一天前、取消在一天内：只算取消这一次
-        listing.raised_hands.create!(
-          user: actor,
-          created_at: 30.hours.ago,
-          cancelled_at: 3.hours.ago,
-        )
-        listing.raised_hands.create!(user: actor, created_at: 2.hours.ago, cancelled_at: 1.hour.ago)
-      end
+    # 次数按日本时间每天 0 点清零（Issue #17）。时间固定在日本时间下午三点，免得测试跑在半夜时跨天
+    context "with earlier raises and cancellations" do
+      let(:tokyo) { ActiveSupport::TimeZone["Asia/Tokyo"] }
 
-      it { is_expected.to fail_a_policy(:within_daily_limit) }
+      before { freeze_time(tokyo.parse("2026-10-24 15:00")) }
 
-      it "allows people to do it again the next day" do
-        freeze_time(22.hours.from_now)
-        expect(result).to run_successfully
-      end
-    end
-
-    context "when the earlier actions were more than a day ago" do
-      before do
-        2.times do
+      context "when the actor raised or lowered their hand three times today" do
+        before do
+          # 举手在昨天、取消在今天：只算取消这一次
           listing.raised_hands.create!(
             user: actor,
-            created_at: 26.hours.ago,
-            cancelled_at: 25.hours.ago,
+            created_at: tokyo.parse("2026-10-23 20:00"),
+            cancelled_at: tokyo.parse("2026-10-24 09:00"),
           )
+          listing.raised_hands.create!(
+            user: actor,
+            created_at: tokyo.parse("2026-10-24 10:00"),
+            cancelled_at: tokyo.parse("2026-10-24 11:00"),
+          )
+        end
+
+        it { is_expected.to fail_a_policy(:within_daily_limit) }
+
+        it "still stops them just before midnight Japan time" do
+          freeze_time(tokyo.parse("2026-10-24 23:59"))
+          expect(result).to fail_a_policy(:within_daily_limit)
+        end
+
+        it "lets them again from midnight Japan time" do
+          freeze_time(tokyo.parse("2026-10-25 00:00"))
+          expect(result).to run_successfully
+        end
+
+        it "does not count them on another listing" do
+          other = Fabricate(:kuu_market_listing, topic: Fabricate(:topic, user: author, category:))
+          result = described_class.call(params: { topic_id: other.topic_id }, **dependencies)
+
+          expect(result).to run_successfully
         end
       end
 
-      it { is_expected.to run_successfully }
+      context "when the earlier actions were yesterday, even if less than a day ago" do
+        before do
+          2.times do
+            listing.raised_hands.create!(
+              user: actor,
+              created_at: tokyo.parse("2026-10-23 22:00"),
+              cancelled_at: tokyo.parse("2026-10-23 23:30"),
+            )
+          end
+        end
+
+        it { is_expected.to run_successfully }
+      end
     end
 
     context "when everything is fine" do
