@@ -33,6 +33,26 @@ end
 
 require_relative "lib/discourse_kuu_market/engine"
 
+# ---- 和 discourse-kuu-buddy 共用，两边的这一段要保持一样（二手 Issue #19，2026-10-25）----
+# 几个 KUU 插件都会把自己隐藏的帖子放回「个人主页 → 话题」。各插件只往 SOURCES 里登记自己要放出的帖子，
+# 条件由 reveal 统一合成：所有来源合在一个 OR 里。各插件仍然各自注册 modifier（core 只在登记它的插件开着时
+# 才执行 modifier，只注册一次的话那个插件一关，别的插件也失效）；两个都执行时只是重复加同一个条件，结果不变
+module ::KuuProfileTopics
+  # 名字 => lambda，返回要放出的 topic_id（select(:topic_id) 的 relation）；插件开关关着时返回空
+  SOURCES = {} if !const_defined?(:SOURCES)
+
+  if !respond_to?(:reveal)
+    def self.reveal(topics, options)
+      return topics if options[:filter] != :user_topics || options[:visible] != true
+      return topics if SOURCES.empty?
+
+      ids_sql = SOURCES.values.map { |source| "(#{source.call.to_sql})" }.join(" UNION ")
+      topics.unscope(where: :visible).where("topics.visible OR topics.id IN (#{ids_sql})")
+    end
+  end
+end
+# ---- 共用部分结束 ----
+
 after_initialize do
   reloadable_patch do
     Topic.has_one :kuu_market_listing,
@@ -49,12 +69,16 @@ after_initialize do
   register_topic_preloader_associations(:kuu_market_listing) { SiteSetting.kuu_market_enabled }
 
   # 已出 / 已购买的帖子是隐藏话题，列表和搜索里都没有；但发帖人主页的「话题」里所有人都能看到
-  # （Issue #5 规则 7）。只在这个列表、只在 core 按 visible 过滤了的时候把它们加回来，过期的不加
-  register_modifier(:topic_query_create_list_topics) do |topics, options, _topic_query|
-    next topics if !SiteSetting.kuu_market_enabled
-    next topics if options[:filter] != :user_topics || options[:visible] != true
+  # （Issue #5 规则 7），过期的不放出。和搭子插件共用 KuuProfileTopics，见文件开头（Issue #19）
+  KuuProfileTopics::SOURCES[:market] = -> do
+    listings = DiscourseKuuMarket::Listing
+    (SiteSetting.kuu_market_enabled ? listings.deals_unlisted_by_plugin : listings.none).select(
+      :topic_id,
+    )
+  end
 
-    DiscourseKuuMarket::Listing.with_deals_visible(topics)
+  register_modifier(:topic_query_create_list_topics) do |topics, options, _topic_query|
+    KuuProfileTopics.reveal(topics, options)
   end
 
   # 作者本人和管理员可以随时修改二手帖、切换状态，不受编辑时限限制；作者被禁言时不行

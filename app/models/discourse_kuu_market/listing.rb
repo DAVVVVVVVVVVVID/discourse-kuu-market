@@ -92,18 +92,12 @@ module DiscourseKuuMarket
         .where(status: ACTIVE_STATUS.values)
         .where("kuu_market_listings.active_since <= ?", expiry_cutoff(at))
     end
-
-    # 在按 visible 过滤过的话题列表里，加回插件隐藏的已出 / 已购买帖子。管理员手动隐藏的仍然不显示
-    def self.with_deals_visible(topics)
-      deals =
-        where(status: ENDED_STATUS.values, unlisted_by_plugin: true).joins(:topic).where(
-          topics: {
-            category_id: SiteSetting.kuu_market_category.to_i,
-          },
-        )
-      topics.unscope(where: :visible).where(
-        "topics.visible OR topics.id IN (?)",
-        deals.select(:topic_id),
+    # 插件隐藏的、还在二手市场里的已出 / 已购买帖子（管理员手动隐藏的不算）：发帖人主页「话题」里放出来
+    def self.deals_unlisted_by_plugin
+      where(status: ENDED_STATUS.values, unlisted_by_plugin: true).joins(:topic).where(
+        topics: {
+          category_id: SiteSetting.kuu_market_category.to_i,
+        },
       )
     end
 
